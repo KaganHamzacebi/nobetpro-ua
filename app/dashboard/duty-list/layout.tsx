@@ -1,12 +1,18 @@
 import DutyCard from '@/components/ui/duty-card';
 import { Divider, Flex, Text } from '@mantine/core';
 import dayjs from 'dayjs';
+import { ReactNode } from 'react';
 
 const duties = [{ date: dayjs().toISOString() }];
 
-export default async function Dashboard() {
+interface IDutyListLayout {
+  children: ReactNode;
+}
+
+export default async function DutyListLayout({ children }: Readonly<IDutyListLayout>) {
   return (
     <>
+      {children}
       <header>
         <Text fw={700} size="xl">
           Duties

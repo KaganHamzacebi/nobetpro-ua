@@ -28,7 +28,7 @@ export const updateSession = async (request: NextRequest) => {
 
     // Do not let user the go / route if logged in already
     if ((route === '/' || route === '/dashboard') && !user.error) {
-      return NextResponse.redirect(new URL(`/dashboard/duties`, request.url));
+      return NextResponse.redirect(new URL(`/dashboard/duty-list`, request.url));
     }
     // Unauthorized case
     else if (isProtectedRoute(route) && !user.data.user) {
