@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { createUser } from '../db/actions/user-actions';
 import { NotificationType } from '../enums/NotificationType';
 import { createClient } from './server';
 
@@ -43,6 +44,7 @@ export async function emailSignup(formData: { email: string; password: string })
     redirect(`/?${NotificationType.SignupFailed}=${error.message}`);
   }
 
+  createUser({ email: formData.email });
   revalidatePath('/dashboard');
   redirect('/dashboard');
 }
@@ -62,9 +64,7 @@ export const googleLogin = async () => {
     }
   });
 
-  if (error) {
-    console.log(error);
-  } else {
+  if (!error) {
     return redirect(data.url);
   }
 };

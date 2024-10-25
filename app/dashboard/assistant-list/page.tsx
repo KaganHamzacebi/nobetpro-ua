@@ -1,6 +1,6 @@
 import AssistantDNDList from '@/components/ui/assistant-dnd-list/assistant-dnd-list';
 import AssistantDNDListLoader from '@/components/ui/assistant-dnd-list/assistant-dnd-list-loader';
-import { getAssistants } from '@/libs/db/actions/assistant-actions';
+import { getDefaultAssistants } from '@/libs/db/actions/default-assistant-actions';
 import { NotificationType } from '@/libs/enums/NotificationType';
 import { getUser } from '@/libs/supabase/server';
 import { Divider, Text } from '@mantine/core';
@@ -13,7 +13,7 @@ export default async function AssistantList() {
     redirect(`/${NotificationType.Unauthorized}=true`);
   }
 
-  const assistantList = await getAssistants(user.id);
+  const assistantList = await getDefaultAssistants(user.id);
 
   return (
     <>

@@ -1,6 +1,6 @@
 'use client';
 
-import { SelectAssistant } from '@/libs/db/schema';
+import { IDefaultAssistant } from '@/libs/models/IAssistant';
 import classes from '@/styles/AssistantDndList.module.scss';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { rem, Text } from '@mantine/core';
@@ -9,14 +9,14 @@ import { IconGripVertical } from '@tabler/icons-react';
 import cx from 'clsx';
 
 interface IAssistantDNDList {
-  assistantList: SelectAssistant[] | undefined;
+  assistantList: IDefaultAssistant[];
 }
 
 export default function AssistantDNDList({ assistantList }: Readonly<IAssistantDNDList>) {
   const [state, handlers] = useListState(assistantList ?? []);
 
   const items = state.map((item, index) => (
-    <Draggable key={item.assistant_name} index={index} draggableId={item.assistant_name}>
+    <Draggable key={item.name} index={index} draggableId={item.name}>
       {(provided, snapshot) => (
         <div
           className={cx(classes.item, { [classes.itemDragging]: snapshot.isDragging })}
@@ -25,7 +25,7 @@ export default function AssistantDNDList({ assistantList }: Readonly<IAssistantD
           <div {...provided.dragHandleProps} className={classes.dragHandle}>
             <IconGripVertical style={{ width: rem(18), height: rem(18) }} stroke={1.5} />
           </div>
-          <Text>{item.assistant_name}</Text>
+          <Text>{item.name}</Text>
         </div>
       )}
     </Draggable>

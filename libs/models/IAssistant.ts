@@ -1,4 +1,5 @@
 import { ISection } from '@/libs/models/ISection';
+import { type Prisma } from '@prisma/client';
 
 export interface IAssistant {
   id: string;
@@ -18,3 +19,5 @@ export interface IAssistant {
     version?: string;
   };
 }
+
+export type IDefaultAssistant = Prisma.DefaultAssistantGetPayload<object>;
