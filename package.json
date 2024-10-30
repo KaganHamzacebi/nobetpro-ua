@@ -5,11 +5,10 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build --no-lint",
-    "build:lint": "next build",
+    "build:lint": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
-    "prettier": "prettier --write .",
-    "postinstall": "prisma generate --no-engine"
+    "prettier": "prettier --write ."
   },
   "dependencies": {
     "@hello-pangea/dnd": "^17.0.0",
@@ -36,7 +35,6 @@
     "sass": "^1.77.8"
   },
   "devDependencies": {
-    "@prisma/extension-accelerate": "^1.2.1",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^22",
     "@types/react": "^18",
