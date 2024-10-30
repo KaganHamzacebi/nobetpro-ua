@@ -4,8 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "postbuild": "prisma generate",
     "build": "next build --no-lint",
-    "build:lint": "prisma generate && next build",
+    "build:lint": "next build",
     "start": "next start",
     "lint": "next lint",
     "prettier": "prettier --write ."
