@@ -62,9 +62,7 @@ export const googleLogin = async () => {
     }
   });
 
-  if (error) {
-    console.log(error);
-  } else {
+  if (!error) {
     return redirect(data.url);
   }
 };

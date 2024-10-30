@@ -2,18 +2,23 @@
 
 import classes from '@/styles/DashboardNavbar.module.scss';
 import { AppShell, rem, ScrollArea } from '@mantine/core';
-import { IconListCheck, IconUser } from '@tabler/icons-react';
+import { IconListCheck, IconSquares, IconUser } from '@tabler/icons-react';
 import { NavbarItem } from './navbar-item';
 import { UserButton } from './user-button';
 
 const navbarIconStyle = { style: { width: rem(18), height: rem(18) } };
 
 const navbarItems = [
-  { label: 'Duties', link: '/dashboard/duties', icon: <IconListCheck {...navbarIconStyle} /> },
+  { label: 'Duties', link: '/dashboard/duty-list', icon: <IconListCheck {...navbarIconStyle} /> },
   {
     label: 'Assistants',
     link: '/dashboard/assistant-list',
     icon: <IconUser {...navbarIconStyle} />
+  },
+  {
+    label: 'Sections',
+    link: '/dashboard/section-list',
+    icon: <IconSquares {...navbarIconStyle} />
   }
 ];
 

@@ -28,7 +28,7 @@ export const updateSession = async (request: NextRequest) => {
 
     // Do not let user the go / route if logged in already
     if ((route === '/' || route === '/dashboard') && !user.error) {
-      return NextResponse.redirect(new URL(`/dashboard/duties`, request.url));
+      return NextResponse.redirect(new URL(`/dashboard/duty-list`, request.url));
     }
     // Unauthorized case
     else if (isProtectedRoute(route) && !user.data.user) {
@@ -37,7 +37,6 @@ export const updateSession = async (request: NextRequest) => {
 
     return response;
   } catch (e) {
-    console.log(e);
     // If you are here, a Supabase client could not be created!
     // This is likely because you have not set up environment variables.
     // Check out http://localhost:3000 for Next Steps.

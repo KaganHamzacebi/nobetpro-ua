@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "prisma generate",
     "build": "next build --no-lint",
     "build:lint": "next build",
     "start": "next start",
@@ -17,6 +18,7 @@
     "@mantine/form": "^7.13.0",
     "@mantine/hooks": "^7.12.0",
     "@mantine/notifications": "^7.12.2",
+    "@prisma/client": "^5.21.1",
     "@supabase/ssr": "^0.5.1",
     "@supabase/supabase-js": "^2.45.4",
     "@tabler/icons-react": "^3.14.0",
@@ -25,8 +27,6 @@
     "@vercel/speed-insights": "^1.0.12",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
-    "drizzle-kit": "^0.25.0",
-    "drizzle-orm": "^0.34.1",
     "google-one-tap": "^1.0.6",
     "mantine-react-table": "2.0.0-beta.6",
     "next": "14.2.13",
@@ -57,6 +57,7 @@
     "postcss-simple-vars": "^7.0.1",
     "prettier-plugin-organize-imports": "^4.1.0",
     "prettier-plugin-tailwindcss": "^0.6.6",
+    "prisma": "^5.21.1",
     "tailwindcss": "^3.4.10",
     "typescript": "^5",
     "use-deep-compare-effect": "^1.8.1"
