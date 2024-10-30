@@ -75,9 +75,6 @@ importers:
         specifier: ^1.77.8
         version: 1.79.5
     devDependencies:
-      '@prisma/extension-accelerate':
-        specifier: ^1.2.1
-        version: 1.2.1(@prisma/client@5.21.1(prisma@5.21.1))
       '@types/bcryptjs':
         specifier: ^2.4.6
         version: 2.4.6
@@ -466,12 +463,6 @@ packages:
 
   '@prisma/engines@5.21.1':
     resolution: {integrity: sha512-hGVTldUkIkTwoV8//hmnAAiAchi4oMEKD3aW5H2RrnI50tTdwza7VQbTTAyN3OIHWlK5DVg6xV7X8N/9dtOydA==}
-
-  '@prisma/extension-accelerate@1.2.1':
-    resolution: {integrity: sha512-QicnMeyqL226ilT3vvRsFAqPeIdqHGKR4c25CoK5zZ1tNIv8egfgpD1gCKqOGmfAz0pIKQnMuJU3eNg9KItC7A==}
-    engines: {node: '>=16'}
-    peerDependencies:
-      '@prisma/client': '>=4.16.1'
 
   '@prisma/fetch-engine@5.21.1':
     resolution: {integrity: sha512-70S31vgpCGcp9J+mh/wHtLCkVezLUqe/fGWk3J3JWZIN7prdYSlr1C0niaWUyNK2VflLXYi8kMjAmSxUVq6WGQ==}
@@ -3030,10 +3021,6 @@ snapshots:
       '@prisma/engines-version': 5.21.1-1.bf0e5e8a04cada8225617067eaa03d041e2bba36
       '@prisma/fetch-engine': 5.21.1
       '@prisma/get-platform': 5.21.1
-
-  '@prisma/extension-accelerate@1.2.1(@prisma/client@5.21.1(prisma@5.21.1))':
-    dependencies:
-      '@prisma/client': 5.21.1(prisma@5.21.1)
 
   '@prisma/fetch-engine@5.21.1':
     dependencies:
