@@ -1,5 +1,5 @@
-import AssistantDNDList from '@/components/ui/assistant-dnd-list/assistant-dnd-list';
-import AssistantDNDListLoader from '@/components/ui/assistant-dnd-list/assistant-dnd-list-loader';
+import DefaultAssistantGrid from '@/components/ui/default-assistant-grid/default-assistant-grid';
+import DefaultAssistantGridLoader from '@/components/ui/default-assistant-grid/default-assistant-grid-loader';
 import { getDefaultAssistants } from '@/libs/db/actions/default-assistant-actions';
 import { NotificationType } from '@/libs/enums/NotificationType';
 import { getUser } from '@/libs/supabase/server';
@@ -27,8 +27,8 @@ export default async function AssistantList() {
         <Divider mt={4} />
       </header>
       <main className="py-4">
-        <Suspense fallback={<AssistantDNDListLoader />}>
-          <AssistantDNDList assistantList={assistantList} />
+        <Suspense fallback={<DefaultAssistantGridLoader />}>
+          <DefaultAssistantGrid assistantList={assistantList} />
         </Suspense>
       </main>
     </>

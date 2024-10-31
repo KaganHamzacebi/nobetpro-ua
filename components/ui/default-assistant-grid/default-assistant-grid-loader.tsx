@@ -1,6 +1,6 @@
 import { Skeleton, Stack } from '@mantine/core';
 
-export default function AssistantDNDListLoader() {
+export default function DefaultAssistantGridLoader() {
   return (
     <Stack gap="xs">
       {Array.from({ length: 4 }).map(() => (
