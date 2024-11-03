@@ -20,7 +20,6 @@ export const emailLogin = async (formData: { email: string; password: string }) 
   const { error } = await supabase.auth.signInWithPassword(credentials);
 
   if (error) {
-    console.log(error);
     redirect(`/?${NotificationType.LoginFailed}=${error.message}`);
   }
 
@@ -39,7 +38,6 @@ export async function emailSignup(formData: { email: string; password: string })
   const { error } = await supabase.auth.signUp(credentials);
 
   if (error) {
-    console.log(error);
     redirect(`/?${NotificationType.SignupFailed}=${error.message}`);
   }
 
@@ -49,8 +47,7 @@ export async function emailSignup(formData: { email: string; password: string })
 
 export const resetPassword = async (email: string) => {
   const supabase = createClient();
-  const { error } = await supabase.auth.resetPasswordForEmail(email);
-  console.log(error);
+  await supabase.auth.resetPasswordForEmail(email);
   redirect('/paswordReset=true');
 };
 
