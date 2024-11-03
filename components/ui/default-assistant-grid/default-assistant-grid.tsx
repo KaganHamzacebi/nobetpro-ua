@@ -62,6 +62,7 @@ export default function DefaultAssistantGrid() {
     editDisplayMode: 'cell', // ('modal', 'row', 'table', and 'custom' are also available)
     enableRowActions: true,
     enableRowNumbers: true,
+    rowNumberDisplayMode: 'original',
     positionToolbarAlertBanner: 'bottom',
     positionActionsColumn: 'last',
     getRowId: row => row.id,
