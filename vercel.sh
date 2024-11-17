@@ -1,5 +1,7 @@
 #!/bin/bash
  
 if [[ $VERCEL_ENV == "production"  ]] ; then
-  npm run build:production
+  pnpm run build:production
+else
+  pnpm run build
 fi
