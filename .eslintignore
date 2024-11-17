@@ -9,4 +9,4 @@ next-env.d.ts
 *.js
 *.yaml
 *.yml
-app/_components/icons/*
+components/icons/**/*
