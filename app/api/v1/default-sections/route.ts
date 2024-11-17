@@ -1,11 +1,7 @@
 import prisma from '@/libs/db/prisma';
 import { createClient } from '@/libs/supabase/server';
 
-interface IGETRequest {
-  request: Request;
-}
-
-export async function GET({ request }: IGETRequest) {
+export async function GET() {
   const supabase = createClient();
   const session = await supabase.auth.getUser();
   const userId = session.data.user?.id;
