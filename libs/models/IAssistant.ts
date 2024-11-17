@@ -20,4 +20,4 @@ export interface IAssistant {
   };
 }
 
-export type IDefaultAssistant = Prisma.DefaultAssistantGetPayload<object>;
+export type IDefaultAssistant = Prisma.DefaultAssistantGetPayload<any>;
