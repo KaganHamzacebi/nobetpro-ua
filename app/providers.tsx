@@ -4,6 +4,7 @@ import NotificationCenter from '@/components/ui/notification-center';
 import { getUser } from '@/libs/supabase/client';
 import { theme } from '@/theme';
 import { MantineProvider } from '@mantine/core';
+import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
 import { User } from '@supabase/supabase-js';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -32,11 +33,13 @@ export default function Providers({ children }: Readonly<{ children: ReactNode }
     <UserContext.Provider value={user}>
       <QueryClientProvider client={queryClient}>
         <MantineProvider theme={theme} defaultColorScheme="dark">
-          <Notifications />
-          <Suspense>
-            <NotificationCenter />
-          </Suspense>
-          {children}
+          <ModalsProvider>
+            <Notifications />
+            <Suspense>
+              <NotificationCenter />
+            </Suspense>
+            {children}
+          </ModalsProvider>
         </MantineProvider>
       </QueryClientProvider>
     </UserContext.Provider>

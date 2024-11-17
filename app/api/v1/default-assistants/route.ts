@@ -15,7 +15,8 @@ export async function GET() {
   }
 
   const data = await prisma.defaultAssistant.findMany({
-    where: { userId: userId }
+    where: { userId: userId },
+    orderBy: { name: 'asc' }
   });
 
   return Response.json(data);
@@ -40,4 +41,23 @@ export async function POST(request: Request) {
     data: createData
   });
   return Response.json(data);
+}
+
+// Update Default Assistants
+export async function PUT(request: Request) {
+  const user = await getUser();
+  const userId = user?.id;
+
+  type UpdateInput = Prisma.DefaultAssistantUpdateInput & { id: string };
+  const body: UpdateInput = await request.json();
+
+  const response = await prisma.defaultAssistant.update({
+    where: {
+      id: body.id,
+      userId: userId
+    },
+    data: body
+  });
+
+  return Response.json(response);
 }

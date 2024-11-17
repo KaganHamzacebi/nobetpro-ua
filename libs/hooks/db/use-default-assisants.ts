@@ -1,8 +1,40 @@
-import { BASE_API_URL } from '@/libs/consts/api';
+import { showSuccessNotification } from '@/libs/helpers/notification-service';
 import { IDefaultAssistant } from '@/libs/models/IAssistant';
+import {
+  createDefaultAssistant,
+  deleteDefaultAssistants,
+  getDefaultAssistants,
+  updateDefaultAssistant
+} from '@/libs/service/default-assistant.service';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
 
-export const useGetDefaultAssistants = () => {
+export const useDefaultAssistant = () => {
+  useEffect(() => {
+    const fetchAssistants = async () => await getDefaultAssistants();
+    fetchAssistants();
+  }, []);
+
+  const { data, isLoading: isGetLoading, isFetching: isGetFetching } = useGetQuery();
+  const { mutateAsync: createDefaultAssistant, isPending: isCreating } = useCreateQuery();
+  const { mutateAsync: updateDefaultAssistant, isPending: isUpdating } = useUpdateQuery();
+  const { mutateAsync: deleteDefaultAssistant, isPending: isDeleting } = useDeleteQuery();
+
+  // STATES
+  const isLoading = isGetLoading;
+  const isPending = isCreating || isDeleting || isUpdating || isGetFetching;
+
+  return {
+    createDefaultAssistant,
+    deleteDefaultAssistant,
+    updateDefaultAssistant,
+    defaultAssistantList: data ?? [],
+    isLoading,
+    isPending
+  };
+};
+
+const useGetQuery = () => {
   return useQuery<IDefaultAssistant[], Error>({
     queryKey: ['defaultAssistants'],
     queryFn: getDefaultAssistants,
@@ -10,38 +42,54 @@ export const useGetDefaultAssistants = () => {
   });
 };
 
-const getDefaultAssistants = async () => {
-  const response = await fetch(BASE_API_URL + `/default-assistants`);
-  if (!response.ok) {
-    throw new Error('Error fetching default assistants');
-  }
-
-  return response.json();
-};
-
-export const useCreateDefaultAssistant = () => {
+const useCreateQuery = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: createDefaultAssistant,
-    onMutate: newDefaultAssistant => {
+    onSuccess: newDefaultAssistant => {
       queryClient.setQueryData(['defaultAssistants'], (prev: IDefaultAssistant[]) => [
         ...prev,
         newDefaultAssistant
       ]);
+      showSuccessNotification({
+        title: 'Create Success',
+        message: 'Default Assistant successfully created'
+      });
     }
   });
 };
 
-const createDefaultAssistant = async (defaultAssistant: { name: string }) => {
-  const response = await fetch(BASE_API_URL + `/default-assistants`, {
-    method: 'POST',
-    body: JSON.stringify(defaultAssistant)
+const useDeleteQuery = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deleteDefaultAssistants,
+    onSuccess: (deletedIds: string[]) => {
+      queryClient.setQueryData(['defaultAssistants'], (prev: IDefaultAssistant[]) =>
+        prev.filter(d => !deletedIds.includes(d.id))
+      );
+      showSuccessNotification({
+        title: 'Delete Success',
+        message: 'Default Assistant(s) successfully deleted'
+      });
+    }
   });
+};
 
-  if (!response.ok) {
-    throw new Error('Error creating default assistants');
-  }
+const useUpdateQuery = () => {
+  const queryClient = useQueryClient();
 
-  return response.json();
+  return useMutation({
+    mutationFn: updateDefaultAssistant,
+    onSuccess: (updatedAssistant: IDefaultAssistant) => {
+      queryClient.setQueryData(['defaultAssistants'], (prev: IDefaultAssistant[]) =>
+        prev.map(d => (d.id === updatedAssistant.id ? updatedAssistant : d))
+      );
+      showSuccessNotification({
+        title: 'Update Success',
+        message: 'Default Assistant successfully updated'
+      });
+    }
+  });
 };
