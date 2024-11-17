@@ -1,25 +1,13 @@
 'use client';
 
-import { getUser } from '@/libs/supabase/client';
+import { useUser } from '@/app/providers';
 import { signOut } from '@/libs/supabase/login-actions';
 import classes from '@/styles/UserButton.module.scss';
 import { Avatar, Group, Menu, Text, UnstyledButton, rem } from '@mantine/core';
-import { User } from '@supabase/supabase-js';
 import { IconChevronRight, IconLogout, IconSettings } from '@tabler/icons-react';
-import { useEffect, useState } from 'react';
 
 export function UserButton() {
-  const [user, setUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      const user = await getUser();
-      setUser(user);
-      console.log(user);
-    };
-
-    fetchUser();
-  }, []);
+  const user = useUser();
 
   const userButton = (
     <UnstyledButton className={classes.user}>
