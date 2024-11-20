@@ -20,7 +20,7 @@ interface IRootLayout {
 
 export default function RootLayout({ children }: Readonly<IRootLayout>) {
   return (
-    <html lang="en" className="min-h-screen">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <title>Nöbet Pro</title>
         <ColorSchemeScript />

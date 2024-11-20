@@ -7,14 +7,8 @@ import {
   updateDefaultAssistant
 } from '@/libs/service/default-assistant.service';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect } from 'react';
 
 export const useDefaultAssistant = () => {
-  useEffect(() => {
-    const fetchAssistants = async () => await getDefaultAssistants();
-    fetchAssistants();
-  }, []);
-
   const { data, isLoading: isGetLoading, isFetching: isGetFetching } = useGetQuery();
   const { mutateAsync: createDefaultAssistant, isPending: isCreating } = useCreateQuery();
   const { mutateAsync: updateDefaultAssistant, isPending: isUpdating } = useUpdateQuery();
