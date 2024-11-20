@@ -1,5 +1,6 @@
 import Providers from '@/app/providers';
 import Shell from '@/components/ui/shell';
+import { getUser } from '@/libs/supabase/server';
 import '@/styles/globals.scss';
 import { ColorSchemeScript } from '@mantine/core';
 import type { Metadata } from 'next';
@@ -18,9 +19,11 @@ interface IRootLayout {
   children: ReactNode;
 }
 
-export default function RootLayout({ children }: Readonly<IRootLayout>) {
+export default async function RootLayout({ children }: Readonly<IRootLayout>) {
+  const user = await getUser();
+
   return (
-    <html lang="en" className="min-h-screen">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <title>Nöbet Pro</title>
         <ColorSchemeScript />
@@ -30,7 +33,7 @@ export default function RootLayout({ children }: Readonly<IRootLayout>) {
         />
       </head>
       <body className={`${inter.className} min-h-screen`}>
-        <Providers>
+        <Providers user={user}>
           <Shell>{children}</Shell>
         </Providers>
         <Metrics />

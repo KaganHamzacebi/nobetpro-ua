@@ -6,6 +6,7 @@
     "dev": "next dev",
     "prebuild": "prisma generate",
     "build": "next build --no-lint",
+    "build:production": "next build --no-lint && npx prisma db push --accept-data-loss",
     "build:lint": "next build",
     "start": "next start",
     "lint": "next lint",
