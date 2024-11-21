@@ -14,14 +14,14 @@
   },
   "root": true,
   "extends": [
+    "next",
+    "next/typescript",
     "next/core-web-vitals",
-    "prettier",
     "eslint:recommended",
-    "plugin:prettier/recommended",
+    "prettier",
     "plugin:prettier/recommended"
-    "plugin:@typescript-eslint/recommended",
   ],
-  "plugins": ["prettier", "@typescript-eslint", "react", "react-hooks"],
+  "plugins": ["prettier", "@typescript-eslint"],
   "rules": {
     "react/react-in-jsx-scope": "off",
     "react/prop-types": 1,
