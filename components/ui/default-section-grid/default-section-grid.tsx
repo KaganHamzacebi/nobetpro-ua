@@ -34,7 +34,7 @@ export default function DefaultSectionGrid() {
   const onCreatingRowSave = useCallback<OnCreatingRowSave<IDefaultSection>>(
     ({ values, exitCreatingMode }) => {
       const handleCreation = async () => {
-        await createDefaultSection({ name: values.name });
+        await createDefaultSection({ name: values.name, color: values.color });
         exitCreatingMode();
       };
 
