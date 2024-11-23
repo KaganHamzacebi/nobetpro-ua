@@ -1,8 +1,8 @@
 'use client';
 
 import { caseInsensitiveSorter } from '@/libs/helpers/case-insensitive-sorter.helper';
-import { useDefaultAssistant } from '@/libs/hooks/db/use-default-assisants';
-import { IDefaultAssistant } from '@/libs/models/IAssistant';
+import { useDefaultSection } from '@/libs/hooks/db/use-default-sections';
+import { IDefaultSection } from '@/libs/models/ISection';
 import {
   OnCreatingRowSave,
   RenderRowActions,
@@ -20,70 +20,70 @@ import {
 } from 'mantine-react-table';
 import { useCallback, useMemo } from 'react';
 
-export default function DefaultAssistantGrid() {
+export default function DefaultSectionGrid() {
   const {
-    createDefaultAssistant,
-    deleteDefaultAssistant,
-    updateDefaultAssistant,
-    defaultAssistantList,
+    createDefaultSection,
+    updateDefaultSection,
+    deleteDefaultSection,
+    defaultSectionList,
     isLoading,
     isPending
-  } = useDefaultAssistant();
+  } = useDefaultSection();
 
   // CREATE action
-  const onCreatingRowSave = useCallback<OnCreatingRowSave<IDefaultAssistant>>(
+  const onCreatingRowSave = useCallback<OnCreatingRowSave<IDefaultSection>>(
     ({ values, exitCreatingMode }) => {
       const handleCreation = async () => {
-        await createDefaultAssistant({ name: values.name });
+        await createDefaultSection({ name: values.name });
         exitCreatingMode();
       };
 
       handleCreation();
     },
-    [createDefaultAssistant]
+    [createDefaultSection]
   );
 
   // Explicitly type the function
-  const handleUpdateAssistant = useCallback(
+  const handleUpdateSection = useCallback(
     (
-      table: MRT_TableInstance<IDefaultAssistant>,
-      row: MRT_Row<IDefaultAssistant>,
+      table: MRT_TableInstance<IDefaultSection>,
+      row: MRT_Row<IDefaultSection>,
       value: string,
-      field: keyof IDefaultAssistant
+      field: keyof IDefaultSection
     ): void => {
-      // If currently creating an assistant, bypass the update logic
+      // If currently creating a section, bypass the update logic
       const isCreating = !!table.getState().creatingRow; // Ensure 'table' is properly typed
       if (isCreating) return;
 
-      const updatedDefaultAssistants = {
+      const updatedDefaultSection = {
         id: row.original.id,
         [field]: value
       };
-      updateDefaultAssistant(updatedDefaultAssistants); // Ensure 'updateDefaultAssistant' is typed
+      updateDefaultSection(updatedDefaultSection);
     },
-    [updateDefaultAssistant] // Add 'table' as a dependency if needed
+    [updateDefaultSection] // Add 'table' as a dependency if needed
   );
 
   // DELETE action
-  const handleDeleteSelectedDefaultAssistants = useCallback(
-    async (table: MRT_TableInstance<IDefaultAssistant>) => {
+  const handleDeleteSelectedDefaultSections = useCallback(
+    async (table: MRT_TableInstance<IDefaultSection>) => {
       const idsToDelete = Object.keys(table.getSelectedRowModel().rowsById);
       if (idsToDelete.length == 0) {
-        throw new Error('There is no selected assistants to delete');
+        throw new Error('There is no selected sections to delete');
       }
 
-      await deleteDefaultAssistant(idsToDelete);
+      await deleteDefaultSection(idsToDelete);
       table.resetRowSelection();
     },
-    [deleteDefaultAssistant]
+    [deleteDefaultSection]
   );
 
-  const deleteAssistant = useCallback(
-    async (defaultAssistantId: string, table: MRT_TableInstance<IDefaultAssistant>) => {
-      await deleteDefaultAssistant([defaultAssistantId]);
+  const deleteSection = useCallback(
+    async (defaultSectionId: string, table: MRT_TableInstance<IDefaultSection>) => {
+      await deleteDefaultSection([defaultSectionId]);
       table.resetRowSelection();
     },
-    [deleteDefaultAssistant]
+    [deleteDefaultSection]
   );
 
   const askForDeletion = useCallback((onConfirmFn: () => void) => {
@@ -94,15 +94,15 @@ export default function DefaultAssistantGrid() {
       confirmProps: { color: 'red' },
       children: (
         <Text size="sm">
-          Are you sure that you want to delete the selected default assistant(s)? Selected Default
-          Assistant will be deleted after the confirmation!
+          Are you sure that you want to delete the selected default section(s)? Selected Default
+          Section will be deleted after the confirmation!
         </Text>
       ),
       onConfirm: onConfirmFn
     });
   }, []);
 
-  const columns = useMemo<MRT_ColumnDef<IDefaultAssistant>[]>(
+  const columns = useMemo<MRT_ColumnDef<IDefaultSection>[]>(
     () => [
       {
         accessorKey: 'name',
@@ -110,26 +110,42 @@ export default function DefaultAssistantGrid() {
         sortingFn: caseInsensitiveSorter,
         mantineEditTextInputProps: ({ row, table }) => ({
           type: 'text',
-          onBlur: event => handleUpdateAssistant(table, row, event.target.value, 'name')
+          onBlur: event => handleUpdateSection(table, row, event.target.value, 'name')
+        })
+      },
+      {
+        accessorKey: 'defaultValue',
+        header: 'Value',
+        sortingFn: caseInsensitiveSorter,
+        mantineEditTextInputProps: ({ row, table }) => ({
+          type: 'text',
+          onBlur: event => handleUpdateSection(table, row, event.target.value, 'defaultValue')
+        })
+      },
+      {
+        accessorKey: 'color',
+        header: 'Color',
+        sortingFn: caseInsensitiveSorter,
+        mantineEditTextInputProps: ({ row, table }) => ({
+          type: 'text',
+          onBlur: event => handleUpdateSection(table, row, event.target.value, 'defaultValue')
         })
       }
     ],
-    [handleUpdateAssistant]
+    [handleUpdateSection]
   );
 
-  const openEditingRow = useCallback((table: MRT_TableInstance<IDefaultAssistant>) => {
+  const openEditingRow = useCallback((table: MRT_TableInstance<IDefaultSection>) => {
     table.setCreatingRow(true);
   }, []);
 
   // Top Toolbar Custom Actions
-  const renderTopToolbarCustomActions = useCallback<
-    RenderTopToolbarCustomActions<IDefaultAssistant>
-  >(
+  const renderTopToolbarCustomActions = useCallback<RenderTopToolbarCustomActions<IDefaultSection>>(
     ({ table }) => (
       <Group>
-        <Button onClick={() => openEditingRow(table)}>New Assistant</Button>
+        <Button onClick={() => openEditingRow(table)}>New Section</Button>
         <Button
-          onClick={() => askForDeletion(() => handleDeleteSelectedDefaultAssistants(table))}
+          onClick={() => askForDeletion(() => handleDeleteSelectedDefaultSections(table))}
           disabled={!table.getIsSomeRowsSelected() && !table.getIsAllRowsSelected()}
           variant="outline"
           color="red">
@@ -137,26 +153,26 @@ export default function DefaultAssistantGrid() {
         </Button>
       </Group>
     ),
-    [askForDeletion, handleDeleteSelectedDefaultAssistants, openEditingRow]
+    [askForDeletion, handleDeleteSelectedDefaultSections, openEditingRow]
   );
 
   // Row Actions
-  const renderRowActions = useCallback<RenderRowActions<IDefaultAssistant>>(
+  const renderRowActions = useCallback<RenderRowActions<IDefaultSection>>(
     ({ row, table }) => (
       <Group content="center">
         <UnstyledButton
           color="red"
-          onClick={() => askForDeletion(() => deleteAssistant(row.original.id, table))}>
+          onClick={() => askForDeletion(() => deleteSection(row.original.id, table))}>
           <IconTrash size={20} color="red" />
         </UnstyledButton>
       </Group>
     ),
-    [askForDeletion, deleteAssistant]
+    [askForDeletion, deleteSection]
   );
 
-  const table = useMantineReactTable<IDefaultAssistant>({
+  const table = useMantineReactTable<IDefaultSection>({
     columns: columns,
-    data: defaultAssistantList,
+    data: defaultSectionList,
     enableEditing: true,
     enablePagination: false,
     enableRowSelection: true,
