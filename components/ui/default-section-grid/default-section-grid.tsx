@@ -8,7 +8,7 @@ import {
   RenderRowActions,
   RenderTopToolbarCustomActions
 } from '@/libs/models/MRTGridTypes';
-import { Button, Group, Text, UnstyledButton } from '@mantine/core';
+import { Button, Group, NumberInput, Text, UnstyledButton } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { IconTrash } from '@tabler/icons-react';
 import {
@@ -18,9 +18,15 @@ import {
   MRT_TableInstance,
   useMantineReactTable
 } from 'mantine-react-table';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import DSColorPicker from '../color-picker';
 
 export default function DefaultSectionGrid() {
+  const [creatingState, setCreatingState] = useState<Partial<IDefaultSection>>({
+    color: '',
+    defaultValue: 0
+  });
+
   const {
     createDefaultSection,
     updateDefaultSection,
@@ -34,13 +40,17 @@ export default function DefaultSectionGrid() {
   const onCreatingRowSave = useCallback<OnCreatingRowSave<IDefaultSection>>(
     ({ values, exitCreatingMode }) => {
       const handleCreation = async () => {
-        await createDefaultSection({ name: values.name, color: values.color });
+        await createDefaultSection({
+          name: values.name,
+          defaultValue: creatingState.defaultValue,
+          color: creatingState.color
+        });
         exitCreatingMode();
       };
 
       handleCreation();
     },
-    [createDefaultSection]
+    [createDefaultSection, creatingState.color, creatingState.defaultValue]
   );
 
   // Explicitly type the function
@@ -48,7 +58,7 @@ export default function DefaultSectionGrid() {
     (
       table: MRT_TableInstance<IDefaultSection>,
       row: MRT_Row<IDefaultSection>,
-      value: string,
+      value: unknown,
       field: keyof IDefaultSection
     ): void => {
       // If currently creating a section, bypass the update logic
@@ -60,6 +70,7 @@ export default function DefaultSectionGrid() {
         [field]: value
       };
       updateDefaultSection(updatedDefaultSection);
+      table.setEditingCell(null);
     },
     [updateDefaultSection] // Add 'table' as a dependency if needed
   );
@@ -102,6 +113,18 @@ export default function DefaultSectionGrid() {
     });
   }, []);
 
+  const handleCreationValues = useCallback(
+    <T extends keyof IDefaultSection>(value: IDefaultSection[T], field: T, isCreating: boolean) => {
+      if (isCreating) {
+        setCreatingState(prev => ({
+          ...prev,
+          [field]: value
+        }));
+      }
+    },
+    []
+  );
+
   const columns = useMemo<MRT_ColumnDef<IDefaultSection>[]>(
     () => [
       {
@@ -110,29 +133,39 @@ export default function DefaultSectionGrid() {
         sortingFn: caseInsensitiveSorter,
         mantineEditTextInputProps: ({ row, table }) => ({
           type: 'text',
-          onBlur: event => handleUpdateSection(table, row, event.target.value, 'name')
+          onBlur: e => handleUpdateSection(table, row, e.target.value, 'name')
         })
       },
       {
         accessorKey: 'defaultValue',
         header: 'Value',
         sortingFn: caseInsensitiveSorter,
-        mantineEditTextInputProps: ({ row, table }) => ({
-          type: 'text',
-          onBlur: event => handleUpdateSection(table, row, event.target.value, 'defaultValue')
-        })
+        Edit: ({ row, table }) => (
+          <NumberInput
+            defaultValue={row.original.defaultValue}
+            allowNegative={false}
+            onChange={value =>
+              handleCreationValues(Number(value), 'defaultValue', !row.original.id)
+            }
+            onBlur={e => handleUpdateSection(table, row, Number(e.target.value), 'defaultValue')}
+          />
+        )
       },
       {
         accessorKey: 'color',
         header: 'Color',
         sortingFn: caseInsensitiveSorter,
-        mantineEditTextInputProps: ({ row, table }) => ({
-          type: 'text',
-          onBlur: event => handleUpdateSection(table, row, event.target.value, 'defaultValue')
-        })
+        enableEditing: false,
+        Cell: ({ row, table }) => (
+          <DSColorPicker
+            color={row.original.color}
+            onChange={value => handleCreationValues(value, 'color', !row.original.id)}
+            onClose={color => handleUpdateSection(table, row, color, 'color')}
+          />
+        )
       }
     ],
-    [handleUpdateSection]
+    [handleCreationValues, handleUpdateSection]
   );
 
   const openEditingRow = useCallback((table: MRT_TableInstance<IDefaultSection>) => {

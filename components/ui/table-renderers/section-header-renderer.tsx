@@ -1,17 +1,9 @@
-import { swatches } from '@/libs/helpers/color-generator';
 import { ISection } from '@/libs/models/ISection';
-import {
-  ActionIcon,
-  ColorPicker,
-  ColorSwatch,
-  Group,
-  Menu,
-  TextInput,
-  Tooltip
-} from '@mantine/core';
+import { ActionIcon, Group, TextInput, Tooltip } from '@mantine/core';
 import { useDebouncedCallback, useDidUpdate } from '@mantine/hooks';
 import { IconTrashFilled } from '@tabler/icons-react';
 import { ChangeEvent, useCallback, useContext, useMemo, useState } from 'react';
+import DSColorPicker from '../color-picker';
 import { SchedulerContext } from '../scheduler/scheduler-base';
 
 interface ISectionHeaderRenderer {
@@ -68,14 +60,7 @@ export default function SectionHeaderRenderer({
   return (
     <Group className="w-full min-w-[200px]" gap={8} wrap="nowrap">
       <TextInput size="xs" value={fields.name} onChange={handleNameChange} />
-      <Menu>
-        <Menu.Target>
-          <ColorSwatch size={20} className="cursor-pointer" color={fields.color} />
-        </Menu.Target>
-        <Menu.Dropdown>
-          <ColorPicker onChange={handleColorChange} swatches={swatches} />
-        </Menu.Dropdown>
-      </Menu>
+      <DSColorPicker onChange={handleColorChange} color={fields.color} />
       <Tooltip label={`Remove ${section.name}`}>
         <ActionIcon size="sm" variant="transparent" onClick={() => removeSection(section.id)}>
           <IconTrashFilled className="text-attention hover:text-attention-hover" />
