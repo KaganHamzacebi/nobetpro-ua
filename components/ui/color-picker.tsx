@@ -5,13 +5,13 @@ import { ColorPicker, ColorSwatch, Menu } from '@mantine/core';
 import { useState } from 'react';
 
 interface IDSColorPicker {
-  color?: string;
+  color: string | null;
   onClose?: (color: string) => void;
   onChange?: (color: string) => void;
 }
 
 export default function DSColorPicker(props: Readonly<IDSColorPicker>) {
-  const [color, setColor] = useState<string | undefined>(props.color);
+  const [color, setColor] = useState<string | null>(props.color);
 
   const handleOnClose = () => {
     props.onClose?.(color!);
