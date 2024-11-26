@@ -14,7 +14,7 @@ export default function DSColorPicker(props: Readonly<IDSColorPicker>) {
   const [color, setColor] = useState<string | null>(props.color);
 
   const handleOnClose = () => {
-    props.onClose?.(color!);
+    props.onClose?.(color);
   };
 
   const handleOnChange = (color: string) => {
