@@ -9,7 +9,7 @@ import { createClient } from './server';
 const supabase = createClient();
 const origin = headers().get('origin');
 
-const successLoginNext = `/dashboard?${NotificationType.LoginSuccess}=true`;
+const successLoginNext = `/dashboard/duty-list?${NotificationType.LoginSuccess}=true`;
 
 export const emailLogin = async (formData: { email: string; password: string }) => {
   const credentials = {

@@ -7,14 +7,10 @@ import {
   updateDefaultAssistant
 } from '@/libs/service/default-assistant.service';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect } from 'react';
+
+const queryKey = ['defaultAssistants'];
 
 export const useDefaultAssistant = () => {
-  useEffect(() => {
-    const fetchAssistants = async () => await getDefaultAssistants();
-    fetchAssistants();
-  }, []);
-
   const { data, isLoading: isGetLoading, isFetching: isGetFetching } = useGetQuery();
   const { mutateAsync: createDefaultAssistant, isPending: isCreating } = useCreateQuery();
   const { mutateAsync: updateDefaultAssistant, isPending: isUpdating } = useUpdateQuery();
@@ -36,7 +32,7 @@ export const useDefaultAssistant = () => {
 
 const useGetQuery = () => {
   return useQuery<IDefaultAssistant[], Error>({
-    queryKey: ['defaultAssistants'],
+    queryKey: queryKey,
     queryFn: getDefaultAssistants,
     refetchOnWindowFocus: false
   });
@@ -48,7 +44,7 @@ const useCreateQuery = () => {
   return useMutation({
     mutationFn: createDefaultAssistant,
     onSuccess: newDefaultAssistant => {
-      queryClient.setQueryData(['defaultAssistants'], (prev: IDefaultAssistant[]) => [
+      queryClient.setQueryData(queryKey, (prev: IDefaultAssistant[]) => [
         ...prev,
         newDefaultAssistant
       ]);
@@ -66,7 +62,7 @@ const useDeleteQuery = () => {
   return useMutation({
     mutationFn: deleteDefaultAssistants,
     onSuccess: (deletedIds: string[]) => {
-      queryClient.setQueryData(['defaultAssistants'], (prev: IDefaultAssistant[]) =>
+      queryClient.setQueryData(queryKey, (prev: IDefaultAssistant[]) =>
         prev.filter(d => !deletedIds.includes(d.id))
       );
       showSuccessNotification({
@@ -83,7 +79,7 @@ const useUpdateQuery = () => {
   return useMutation({
     mutationFn: updateDefaultAssistant,
     onSuccess: (updatedAssistant: IDefaultAssistant) => {
-      queryClient.setQueryData(['defaultAssistants'], (prev: IDefaultAssistant[]) =>
+      queryClient.setQueryData(queryKey, (prev: IDefaultAssistant[]) =>
         prev.map(d => (d.id === updatedAssistant.id ? updatedAssistant : d))
       );
       showSuccessNotification({
