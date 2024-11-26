@@ -2,25 +2,33 @@
 
 import { swatches } from '@/libs/helpers/color-generator';
 import { ColorPicker, ColorSwatch, Menu } from '@mantine/core';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
+type Color = string | null;
 interface IDSColorPicker {
-  color: string | null;
-  onClose?: (color: string) => void;
-  onChange?: (color: string) => void;
+  color: Color;
+  onClose?: (color: Color) => void;
+  onChange?: (color: Color) => void;
 }
 
-export default function DSColorPicker(props: Readonly<IDSColorPicker>) {
-  const [color, setColor] = useState<string | null>(props.color);
+export default function DSColorPicker({
+  color: initialColor,
+  onClose,
+  onChange
+}: Readonly<IDSColorPicker>) {
+  const [color, setColor] = useState<Color>(initialColor);
 
-  const handleOnClose = () => {
-    props.onClose?.(color);
-  };
+  const handleOnClose = useCallback(() => {
+    onClose?.(color);
+  }, [color, onClose]);
 
-  const handleOnChange = (color: string) => {
-    setColor(color);
-    props.onChange?.(color);
-  };
+  const handleOnChange = useCallback(
+    (color: string) => {
+      setColor(color);
+      onChange?.(color);
+    },
+    [onChange]
+  );
 
   return (
     <Menu onClose={handleOnClose}>
@@ -28,7 +36,11 @@ export default function DSColorPicker(props: Readonly<IDSColorPicker>) {
         <ColorSwatch size={20} className="cursor-pointer" color={color ?? ''} />
       </Menu.Target>
       <Menu.Dropdown>
-        <ColorPicker onChange={color => handleOnChange(color)} swatches={swatches} />
+        <ColorPicker
+          onChange={color => handleOnChange(color)}
+          swatches={swatches}
+          value={color ?? undefined}
+        />
       </Menu.Dropdown>
     </Menu>
   );
