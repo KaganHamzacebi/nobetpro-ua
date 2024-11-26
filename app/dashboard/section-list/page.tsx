@@ -1,17 +1,7 @@
-import { getDefaultSections } from '@/libs/db/actions/default-section-actions';
-import { NotificationType } from '@/libs/enums/NotificationType';
-import { getUser } from '@/libs/supabase/server';
+import DefaultSectionGrid from '@/components/ui/default-section-grid/default-section-grid';
 import { Divider, Text } from '@mantine/core';
-import { redirect } from 'next/navigation';
 
 export default async function SectionList() {
-  const user = await getUser();
-  if (!user) {
-    redirect(`/${NotificationType.Unauthorized}=true`);
-  }
-
-  const sectionList = await getDefaultSections(user.id);
-
   return (
     <>
       <header>
@@ -23,7 +13,9 @@ export default async function SectionList() {
         </Text>
         <Divider mt={4} />
       </header>
-      <main className="py-4">{sectionList.length}</main>
+      <main className="py-4">
+        <DefaultSectionGrid />
+      </main>
     </>
   );
 }

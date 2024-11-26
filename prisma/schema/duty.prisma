@@ -12,6 +12,7 @@ model DefaultSection {
   id           String   @id @default(uuid())
   name         String
   defaultValue Int      @default(0)
+  color        String?
   createdAt    DateTime @default(now())
   userId       String   @db.Uuid
   User         users    @relation(fields: [userId], references: [id], onDelete: Cascade)

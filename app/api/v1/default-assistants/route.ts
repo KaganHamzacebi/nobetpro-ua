@@ -27,9 +27,10 @@ export async function POST(request: Request) {
   const user = await getUser();
   const userId = user?.id;
 
-  const body = (await request.json()) as { name: string };
+  // body should contain atleast name
+  const body: Omit<Prisma.DefaultAssistantCreateInput, 'User'> = await request.json();
   const createData: Prisma.DefaultAssistantCreateInput = {
-    name: body.name,
+    ...body,
     User: {
       connect: {
         id: userId

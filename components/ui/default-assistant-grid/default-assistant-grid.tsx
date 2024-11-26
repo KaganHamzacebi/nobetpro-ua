@@ -3,6 +3,11 @@
 import { caseInsensitiveSorter } from '@/libs/helpers/case-insensitive-sorter.helper';
 import { useDefaultAssistant } from '@/libs/hooks/db/use-default-assisants';
 import { IDefaultAssistant } from '@/libs/models/IAssistant';
+import {
+  OnCreatingRowSave,
+  RenderRowActions,
+  RenderTopToolbarCustomActions
+} from '@/libs/models/MRTGridTypes';
 import { Button, Group, Text, UnstyledButton } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { IconTrash } from '@tabler/icons-react';
@@ -11,16 +16,9 @@ import {
   MRT_ColumnDef,
   MRT_Row,
   MRT_TableInstance,
-  MRT_TableOptions,
   useMantineReactTable
 } from 'mantine-react-table';
 import { useCallback, useMemo } from 'react';
-
-type OnCreatingRowSave = NonNullable<MRT_TableOptions<IDefaultAssistant>['onCreatingRowSave']>;
-type RenderRowActions = NonNullable<MRT_TableOptions<IDefaultAssistant>['renderRowActions']>;
-type RenderTopToolbarCustomActions = NonNullable<
-  MRT_TableOptions<IDefaultAssistant>['renderTopToolbarCustomActions']
->;
 
 export default function DefaultAssistantGrid() {
   const {
@@ -33,7 +31,7 @@ export default function DefaultAssistantGrid() {
   } = useDefaultAssistant();
 
   // CREATE action
-  const onCreatingRowSave = useCallback<OnCreatingRowSave>(
+  const onCreatingRowSave = useCallback<OnCreatingRowSave<IDefaultAssistant>>(
     ({ values, exitCreatingMode }) => {
       const handleCreation = async () => {
         await createDefaultAssistant({ name: values.name });
@@ -124,7 +122,9 @@ export default function DefaultAssistantGrid() {
   }, []);
 
   // Top Toolbar Custom Actions
-  const renderTopToolbarCustomActions = useCallback<RenderTopToolbarCustomActions>(
+  const renderTopToolbarCustomActions = useCallback<
+    RenderTopToolbarCustomActions<IDefaultAssistant>
+  >(
     ({ table }) => (
       <Group>
         <Button onClick={() => openEditingRow(table)}>New Assistant</Button>
@@ -141,7 +141,7 @@ export default function DefaultAssistantGrid() {
   );
 
   // Row Actions
-  const renderRowActions = useCallback<RenderRowActions>(
+  const renderRowActions = useCallback<RenderRowActions<IDefaultAssistant>>(
     ({ row, table }) => (
       <Group content="center">
         <UnstyledButton
