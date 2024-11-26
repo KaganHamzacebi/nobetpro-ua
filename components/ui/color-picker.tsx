@@ -4,11 +4,10 @@ import { swatches } from '@/libs/helpers/color-generator';
 import { ColorPicker, ColorSwatch, Menu } from '@mantine/core';
 import { useCallback, useState } from 'react';
 
-type Color = string | null;
 interface IDSColorPicker {
-  color: Color;
-  onClose?: (color: Color) => void;
-  onChange?: (color: Color) => void;
+  color: string | null;
+  onClose?: (color: string) => void;
+  onChange?: (color: string) => void;
 }
 
 export default function DSColorPicker({
@@ -16,10 +15,10 @@ export default function DSColorPicker({
   onClose,
   onChange
 }: Readonly<IDSColorPicker>) {
-  const [color, setColor] = useState<Color>(initialColor);
+  const [color, setColor] = useState<string | null>(initialColor);
 
   const handleOnClose = useCallback(() => {
-    onClose?.(color);
+    onClose?.(color ?? '');
   }, [color, onClose]);
 
   const handleOnChange = useCallback(
