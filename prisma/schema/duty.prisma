@@ -35,7 +35,7 @@ model Duty {
 }
 
 model DutyAssistant {
-  id                         String                       @id @default(uuid())
+  id                         String                       @id
   dutyId                     String
   name                       String
   createdAt                  DateTime                     @default(now())
@@ -69,7 +69,7 @@ model DutyAssistantSelectedDays {
 }
 
 model DutySection {
-  id                         String                       @id @default(uuid())
+  id                         String                       @id
   dutyId                     String
   name                       String
   color                      String

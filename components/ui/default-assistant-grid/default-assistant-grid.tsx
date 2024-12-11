@@ -2,7 +2,6 @@
 
 import { caseInsensitiveSorter } from '@/libs/helpers/case-insensitive-sorter.helper';
 import { useDefaultAssistant } from '@/libs/hooks/db/use-default-assisants';
-import { IDefaultAssistant } from '@/libs/models/IAssistant';
 import {
   OnCreatingRowSave,
   RenderRowActions,
@@ -10,6 +9,7 @@ import {
 } from '@/libs/models/MRTGridTypes';
 import { Button, Group, Text, UnstyledButton } from '@mantine/core';
 import { modals } from '@mantine/modals';
+import { DefaultAssistant } from '@prisma/client';
 import { IconTrash } from '@tabler/icons-react';
 import {
   MantineReactTable,
@@ -31,7 +31,7 @@ export default function DefaultAssistantGrid() {
   } = useDefaultAssistant();
 
   // CREATE action
-  const onCreatingRowSave = useCallback<OnCreatingRowSave<IDefaultAssistant>>(
+  const onCreatingRowSave = useCallback<OnCreatingRowSave<DefaultAssistant>>(
     ({ values, exitCreatingMode }) => {
       const handleCreation = async () => {
         await createDefaultAssistant({ name: values.name });
@@ -46,10 +46,10 @@ export default function DefaultAssistantGrid() {
   // Explicitly type the function
   const handleUpdateAssistant = useCallback(
     (
-      table: MRT_TableInstance<IDefaultAssistant>,
-      row: MRT_Row<IDefaultAssistant>,
+      table: MRT_TableInstance<DefaultAssistant>,
+      row: MRT_Row<DefaultAssistant>,
       value: string,
-      field: keyof IDefaultAssistant
+      field: keyof DefaultAssistant
     ): void => {
       // If currently creating an assistant, bypass the update logic
       const isCreating = !!table.getState().creatingRow; // Ensure 'table' is properly typed
@@ -66,7 +66,7 @@ export default function DefaultAssistantGrid() {
 
   // DELETE action
   const handleDeleteSelectedDefaultAssistants = useCallback(
-    async (table: MRT_TableInstance<IDefaultAssistant>) => {
+    async (table: MRT_TableInstance<DefaultAssistant>) => {
       const idsToDelete = Object.keys(table.getSelectedRowModel().rowsById);
       if (idsToDelete.length == 0) {
         throw new Error('There is no selected assistants to delete');
@@ -79,7 +79,7 @@ export default function DefaultAssistantGrid() {
   );
 
   const deleteAssistant = useCallback(
-    async (defaultAssistantId: string, table: MRT_TableInstance<IDefaultAssistant>) => {
+    async (defaultAssistantId: string, table: MRT_TableInstance<DefaultAssistant>) => {
       await deleteDefaultAssistant([defaultAssistantId]);
       table.resetRowSelection();
     },
@@ -102,7 +102,7 @@ export default function DefaultAssistantGrid() {
     });
   }, []);
 
-  const columns = useMemo<MRT_ColumnDef<IDefaultAssistant>[]>(
+  const columns = useMemo<MRT_ColumnDef<DefaultAssistant>[]>(
     () => [
       {
         accessorKey: 'name',
@@ -117,13 +117,13 @@ export default function DefaultAssistantGrid() {
     [handleUpdateAssistant]
   );
 
-  const openEditingRow = useCallback((table: MRT_TableInstance<IDefaultAssistant>) => {
+  const openEditingRow = useCallback((table: MRT_TableInstance<DefaultAssistant>) => {
     table.setCreatingRow(true);
   }, []);
 
   // Top Toolbar Custom Actions
   const renderTopToolbarCustomActions = useCallback<
-    RenderTopToolbarCustomActions<IDefaultAssistant>
+    RenderTopToolbarCustomActions<DefaultAssistant>
   >(
     ({ table }) => (
       <Group>
@@ -141,7 +141,7 @@ export default function DefaultAssistantGrid() {
   );
 
   // Row Actions
-  const renderRowActions = useCallback<RenderRowActions<IDefaultAssistant>>(
+  const renderRowActions = useCallback<RenderRowActions<DefaultAssistant>>(
     ({ row, table }) => (
       <Group content="center">
         <UnstyledButton
@@ -154,7 +154,7 @@ export default function DefaultAssistantGrid() {
     [askForDeletion, deleteAssistant]
   );
 
-  const table = useMantineReactTable<IDefaultAssistant>({
+  const table = useMantineReactTable<DefaultAssistant>({
     columns: columns,
     data: defaultAssistantList,
     enableEditing: true,

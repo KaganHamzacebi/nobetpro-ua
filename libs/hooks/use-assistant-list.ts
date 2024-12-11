@@ -1,37 +1,36 @@
 import { SetStateAction, useCallback, useState } from 'react';
 import { GenerateUUID } from '../helpers/id-generator';
 import { newAssistant } from '../helpers/model-generator';
-import { SelectedDayConfig } from '../models/DutyContext';
-import { IAssistant } from '../models/IAssistant';
+import { IDutyAssistant, SelectedDayConfig } from '../models/IAssistant';
 
 export const useAssistantList = (
-  defaultList: IAssistant[],
+  defaultList: IDutyAssistant[],
   setSelectedDayConfig: (value: SetStateAction<SelectedDayConfig>) => void
 ) => {
   const [assistantList, setAssistantList] = useState(defaultList);
 
   const addNewAssistant = useCallback(() => {
-    setAssistantList(prevState => [
-      ...prevState,
-      newAssistant(`New Assistant - ${prevState.length + 1}`)
-    ]);
+    setAssistantList(prevState => [...prevState, newAssistant({ name: `New Assistant` })]);
   }, []);
 
-  const removeAssistant = useCallback((assistant: IAssistant) => {
-    setAssistantList(prevState => prevState.filter(a => a.id !== assistant.id));
-    setSelectedDayConfig(prevState => {
-      Object.entries(assistant.selectedDays.days).forEach(([dayIndex, section]) => {
-        const selectedDayConfig = prevState[Number(dayIndex)];
-        selectedDayConfig.sectionIds.delete(section.id);
-        selectedDayConfig.version = GenerateUUID();
+  const removeAssistant = useCallback(
+    (assistant: IDutyAssistant) => {
+      setAssistantList(prevState => prevState.filter(a => a.id !== assistant.id));
+      setSelectedDayConfig(prevState => {
+        Object.entries(assistant.selectedDays.days).forEach(([dayIndex, section]) => {
+          const selectedDayConfig = prevState[Number(dayIndex)];
+          selectedDayConfig.sectionIds.delete(section.id);
+          selectedDayConfig.version = GenerateUUID();
+        });
+
+        return prevState;
       });
-
-      return prevState;
-    });
-  }, []);
+    },
+    [setSelectedDayConfig]
+  );
 
   const setAssistantProps = useCallback(
-    (assistantId: IAssistant['id'], props: Partial<IAssistant>) => {
+    (assistantId: IDutyAssistant['id'], props: Partial<IDutyAssistant>) => {
       setAssistantList(prevState =>
         prevState.map(assistant =>
           assistant.id === assistantId ? { ...assistant, ...props } : assistant

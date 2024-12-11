@@ -4,32 +4,44 @@ import { ScreenMode } from '@/libs/enums/screen-mode';
 import { getWeekendDayIndexes } from '@/libs/helpers/get-weekend-indexes';
 import { useAssistantList } from '@/libs/hooks/use-assistant-list';
 import { useSectionList } from '@/libs/hooks/use-section-list';
-import {
-  DefaultAssistantList,
-  DefaultMonthConfig,
-  DefaultSectionList
-} from '@/libs/mock/duty.data';
-import {
-  DefaultSchedulerContext,
-  ISchedulerContext,
-  SelectedDayConfig
-} from '@/libs/models/DutyContext';
+import { DefaultMonthConfig } from '@/libs/mock/duty.data';
+import { ISchedulerContext } from '@/libs/models/DutyTypes';
+import { IDutyAssistant, ISectionConfig, SelectedDayConfig } from '@/libs/models/IAssistant';
 import { MonthConfig } from '@/libs/models/MonthConfig';
 import { Stack } from '@mantine/core';
+import { Duty, DutySection } from '@prisma/client';
 import dayjs from 'dayjs';
-import { createContext, useCallback, useMemo, useState, useTransition } from 'react';
+import { createContext, useCallback, useContext, useState, useTransition } from 'react';
 import Scheduler from './scheduler';
 import SchedulerBottomBar from './scheduler-bottom-bar';
 import SchedulerTopBar from './scheduler-top-bar';
 
-export const SchedulerContext = createContext<ISchedulerContext>(DefaultSchedulerContext);
+const SchedulerContext = createContext<ISchedulerContext>({} as ISchedulerContext);
+export const useSchedulerContext = () => useContext(SchedulerContext);
 
-export default function SchedulerBase() {
+interface ISchedulerBase {
+  duty?: Duty;
+  defaultAssistants: IDutyAssistant[];
+  defaultSections: DutySection[];
+  defaultSectionConfig: ISectionConfig[];
+}
+
+export default function SchedulerBase({
+  duty,
+  defaultAssistants,
+  defaultSections,
+  defaultSectionConfig
+}: Readonly<ISchedulerBase>) {
   const [isPending, startTransition] = useTransition();
   const [monthConfig, setMonthConfig] = useState<MonthConfig>(DefaultMonthConfig);
   const [screenMode, setScreenMode] = useState<ScreenMode>(ScreenMode.MonthPicker);
+  const [sectionConfigList, setSectionConfigList] =
+    useState<ISectionConfig[]>(defaultSectionConfig);
   const [selectedDayConfig, setSelectedDayConfig] = useState<SelectedDayConfig>({});
   const [unwantedDays, setUnwantedDays] = useState<Record<string, boolean>>({});
+
+  const { sectionList, setSectionList, addSection, removeSection, setSectionProps } =
+    useSectionList(defaultSections);
 
   const {
     assistantList,
@@ -38,32 +50,7 @@ export default function SchedulerBase() {
     removeAssistant,
     setAssistantProps,
     handleClearSelections
-  } = useAssistantList(DefaultAssistantList, setSelectedDayConfig);
-
-  const { sectionList, setSectionList, addSection, removeSection, setSectionProps } =
-    useSectionList(DefaultSectionList);
-
-  const contextValue = useMemo(
-    () => ({
-      screenMode,
-      monthConfig,
-      assistantList,
-      setAssistantList,
-      sectionList,
-      setSectionList,
-      selectedDayConfig,
-      setSelectedDayConfig
-    }),
-    [
-      screenMode,
-      monthConfig,
-      assistantList,
-      setAssistantList,
-      sectionList,
-      setSectionList,
-      selectedDayConfig
-    ]
-  );
+  } = useAssistantList(defaultAssistants, setSelectedDayConfig);
 
   const handleScreenModeChange = useCallback((mode: ScreenMode) => {
     startTransition(() => {
@@ -112,7 +99,19 @@ export default function SchedulerBase() {
   );
 
   return (
-    <SchedulerContext.Provider value={contextValue}>
+    <SchedulerContext.Provider
+      value={{
+        screenMode,
+        monthConfig,
+        assistantList,
+        setAssistantList,
+        sectionList,
+        setSectionList,
+        sectionConfigList,
+        setSectionConfigList,
+        selectedDayConfig,
+        setSelectedDayConfig
+      }}>
       <Stack className="h-full w-full" gap="md">
         <SchedulerTopBar
           onDateChange={onDateChange}
@@ -132,6 +131,7 @@ export default function SchedulerBase() {
           addAssistant={addNewAssistant}
           addSection={addSection}
           handleClearSelections={handleClearSelections}
+          isCreateMode={!!duty}
         />
       </Stack>
     </SchedulerContext.Provider>

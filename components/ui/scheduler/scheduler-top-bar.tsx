@@ -1,11 +1,11 @@
 import ExportModal from '@/components/ui/export-modal';
-import { SchedulerContext } from '@/components/ui/scheduler/scheduler-base';
+import { useSchedulerContext } from '@/components/ui/scheduler/scheduler-base';
 import { ScreenMode } from '@/libs/enums/screen-mode';
 import { Group, NumberInput, SegmentedControl } from '@mantine/core';
 import { DateValue, MonthPickerInput } from '@mantine/dates';
 import { IconCalendar } from '@tabler/icons-react';
 import dayjs from 'dayjs';
-import { useContext, useMemo } from 'react';
+import { useMemo } from 'react';
 
 interface ISchedulerTopBar {
   onDateChange: (newDate: DateValue) => void;
@@ -18,11 +18,11 @@ export default function SchedulerTopBar({
   setNumberOfRestDays,
   handleScreenModeChange
 }: Readonly<ISchedulerTopBar>) {
-  const { monthConfig, assistantList, sectionList } = useContext(SchedulerContext);
+  const { monthConfig, assistantList, sectionList } = useSchedulerContext();
 
   const isRestDayDayDisabled = useMemo(() => {
     return false;
-  }, [assistantList]);
+  }, []);
 
   return (
     <Group>
@@ -51,6 +51,7 @@ export default function SchedulerTopBar({
       <div className="ml-auto mt-auto flex flex-row gap-x-4">
         <ExportModal assistantList={assistantList} sectionList={sectionList} />
         <SegmentedControl
+          defaultValue={ScreenMode.MonthPicker}
           onChange={e => handleScreenModeChange(e as ScreenMode)}
           color="yellow"
           data={[

@@ -8,7 +8,7 @@ interface IAddButton {
 
 export default function AddButton({ label, onClick }: Readonly<IAddButton>) {
   return (
-    <Button className="add-button" leftSection={<IconPlus />} onClick={onClick}>
+    <Button leftSection={<IconPlus size={20} />} onClick={onClick}>
       {label}
     </Button>
   );

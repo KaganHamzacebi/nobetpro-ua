@@ -1,43 +1,41 @@
-import { GenerateUUID } from '@/libs/helpers/id-generator';
-import { IAssistant } from '@/libs/models/IAssistant';
-import { ISection } from '@/libs/models/ISection';
+import { IDutyAssistant, ISectionConfig } from '@/libs/models/IAssistant';
 import { NumberInput } from '@mantine/core';
 import { useDebouncedCallback, useDidUpdate } from '@mantine/hooks';
+import { DutySection } from '@prisma/client';
 import { useMemo, useState } from 'react';
+import { useSchedulerContext } from '../scheduler/scheduler-base';
 
 interface ISectionCellRenderer {
-  assistant: IAssistant;
-  section: ISection;
-  setAssistantProps: (assistantId: IAssistant['id'], props: Partial<IAssistant>) => void;
+  assistant: IDutyAssistant;
+  section: DutySection;
+  sectionConfig: ISectionConfig;
 }
 
 export default function SectionCellRenderer({
   assistant,
   section,
-  setAssistantProps
+  sectionConfig
 }: Readonly<ISectionCellRenderer>) {
-  const [count, setCount] = useState<number>(assistant.sectionConfig.counts[section.id] ?? 0);
+  const { setSectionConfigList } = useSchedulerContext();
+  const [count, setCount] = useState<number>(sectionConfig?.counts[section.id] ?? 0);
 
-  const setAssistantSectionConfig = useDebouncedCallback((count: number) => {
-    setAssistantProps(assistant.id, {
-      sectionConfig: {
-        ...assistant.sectionConfig,
-        counts: {
-          ...assistant.sectionConfig.counts,
-          [section.id]: count
-        },
-        version: GenerateUUID()
-      }
-    });
+  const updateSectionConfig = useDebouncedCallback((count: number) => {
+    setSectionConfigList(prevList =>
+      prevList.map(item =>
+        item.assistantId === sectionConfig.assistantId
+          ? { ...item, counts: { ...item.counts, [section.id]: count } }
+          : item
+      )
+    );
   }, 500);
 
   useDidUpdate(() => {
-    setAssistantSectionConfig(count);
+    updateSectionConfig(count);
   }, [count]);
 
   const minimumSelectableDutyCount = useMemo(() => {
     return Object.values(assistant.selectedDays.days).filter(sec => sec.id === section.id).length;
-  }, [assistant.selectedDays.version]);
+  }, [assistant.selectedDays.days, section.id]);
 
   return (
     <div className="w-full min-w-[200px]">

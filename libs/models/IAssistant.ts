@@ -1,23 +1,29 @@
-import { ISection } from '@/libs/models/ISection';
-import { type Prisma } from '@prisma/client';
+import { DutySection } from '@prisma/client';
 
-export interface IAssistant {
+export interface IDutyAssistant {
   id: string;
   name: string;
   selectedDays: {
     // dayIndex - section
-    days: Record<number, ISection>;
+    days: Record<number, DutySection>;
     version?: string;
   };
   disabledDays: {
     days: number[];
     version?: string;
   };
-  sectionConfig: {
-    // sectionId - count
-    counts: Record<string, number>;
-    version?: string;
-  };
 }
 
-export type IDefaultAssistant = Prisma.DefaultAssistantGetPayload<object>;
+export interface ISectionConfig {
+  assistantId: string;
+  counts: Record<string, number>;
+}
+
+// Stores data by DayIndex
+export type SelectedDayConfig = Record<
+  number,
+  {
+    sectionIds: Set<string>;
+    version: string;
+  }
+>;

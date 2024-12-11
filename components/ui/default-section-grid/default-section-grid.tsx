@@ -2,7 +2,6 @@
 
 import { caseInsensitiveSorter } from '@/libs/helpers/case-insensitive-sorter.helper';
 import { useDefaultSection } from '@/libs/hooks/db/use-default-sections';
-import { IDefaultSection } from '@/libs/models/ISection';
 import {
   OnCreatingRowSave,
   RenderRowActions,
@@ -10,6 +9,7 @@ import {
 } from '@/libs/models/MRTGridTypes';
 import { Button, Group, NumberInput, Text, UnstyledButton } from '@mantine/core';
 import { modals } from '@mantine/modals';
+import { type DefaultSection } from '@prisma/client';
 import { IconTrash } from '@tabler/icons-react';
 import {
   MantineReactTable,
@@ -22,7 +22,7 @@ import { useCallback, useMemo, useState } from 'react';
 import DSColorPicker from '../color-picker';
 
 export default function DefaultSectionGrid() {
-  const [creatingState, setCreatingState] = useState<Partial<IDefaultSection>>({
+  const [creatingState, setCreatingState] = useState<Partial<DefaultSection>>({
     color: '',
     defaultValue: 0
   });
@@ -37,7 +37,7 @@ export default function DefaultSectionGrid() {
   } = useDefaultSection();
 
   // CREATE action
-  const onCreatingRowSave = useCallback<OnCreatingRowSave<IDefaultSection>>(
+  const onCreatingRowSave = useCallback<OnCreatingRowSave<DefaultSection>>(
     ({ values, exitCreatingMode }) => {
       const handleCreation = async () => {
         await createDefaultSection({
@@ -56,10 +56,10 @@ export default function DefaultSectionGrid() {
   // Explicitly type the function
   const handleUpdateSection = useCallback(
     (
-      table: MRT_TableInstance<IDefaultSection>,
-      row: MRT_Row<IDefaultSection>,
+      table: MRT_TableInstance<DefaultSection>,
+      row: MRT_Row<DefaultSection>,
       value: unknown,
-      field: keyof IDefaultSection
+      field: keyof DefaultSection
     ): void => {
       // If currently creating a section, bypass the update logic
       const isCreating = !!table.getState().creatingRow; // Ensure 'table' is properly typed
@@ -77,7 +77,7 @@ export default function DefaultSectionGrid() {
 
   // DELETE action
   const handleDeleteSelectedDefaultSections = useCallback(
-    async (table: MRT_TableInstance<IDefaultSection>) => {
+    async (table: MRT_TableInstance<DefaultSection>) => {
       const idsToDelete = Object.keys(table.getSelectedRowModel().rowsById);
       if (idsToDelete.length == 0) {
         throw new Error('There is no selected sections to delete');
@@ -90,7 +90,7 @@ export default function DefaultSectionGrid() {
   );
 
   const deleteSection = useCallback(
-    async (defaultSectionId: string, table: MRT_TableInstance<IDefaultSection>) => {
+    async (defaultSectionId: string, table: MRT_TableInstance<DefaultSection>) => {
       await deleteDefaultSection([defaultSectionId]);
       table.resetRowSelection();
     },
@@ -114,7 +114,7 @@ export default function DefaultSectionGrid() {
   }, []);
 
   const handleCreationValues = useCallback(
-    <T extends keyof IDefaultSection>(value: IDefaultSection[T], field: T, isCreating: boolean) => {
+    <T extends keyof DefaultSection>(value: DefaultSection[T], field: T, isCreating: boolean) => {
       if (isCreating) {
         setCreatingState(prev => ({
           ...prev,
@@ -125,7 +125,7 @@ export default function DefaultSectionGrid() {
     []
   );
 
-  const columns = useMemo<MRT_ColumnDef<IDefaultSection>[]>(
+  const columns = useMemo<MRT_ColumnDef<DefaultSection>[]>(
     () => [
       {
         accessorKey: 'name',
@@ -168,12 +168,12 @@ export default function DefaultSectionGrid() {
     [handleCreationValues, handleUpdateSection]
   );
 
-  const openEditingRow = useCallback((table: MRT_TableInstance<IDefaultSection>) => {
+  const openEditingRow = useCallback((table: MRT_TableInstance<DefaultSection>) => {
     table.setCreatingRow(true);
   }, []);
 
   // Top Toolbar Custom Actions
-  const renderTopToolbarCustomActions = useCallback<RenderTopToolbarCustomActions<IDefaultSection>>(
+  const renderTopToolbarCustomActions = useCallback<RenderTopToolbarCustomActions<DefaultSection>>(
     ({ table }) => (
       <Group>
         <Button onClick={() => openEditingRow(table)}>New Section</Button>
@@ -190,7 +190,7 @@ export default function DefaultSectionGrid() {
   );
 
   // Row Actions
-  const renderRowActions = useCallback<RenderRowActions<IDefaultSection>>(
+  const renderRowActions = useCallback<RenderRowActions<DefaultSection>>(
     ({ row, table }) => (
       <Group content="center">
         <UnstyledButton
@@ -203,7 +203,7 @@ export default function DefaultSectionGrid() {
     [askForDeletion, deleteSection]
   );
 
-  const table = useMantineReactTable<IDefaultSection>({
+  const table = useMantineReactTable<DefaultSection>({
     columns: columns,
     data: defaultSectionList,
     enableEditing: true,

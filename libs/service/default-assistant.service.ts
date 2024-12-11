@@ -1,3 +1,5 @@
+'server-only';
+
 import { type Prisma } from '@prisma/client';
 import { BASE_API_URL } from '../consts/api';
 

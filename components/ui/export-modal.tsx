@@ -1,17 +1,17 @@
-import { IAssistant } from '@/libs/models/IAssistant';
-import { ISection } from '@/libs/models/ISection';
+import { useSchedulerContext } from '@/components/ui/scheduler/scheduler-base';
+import { IDutyAssistant } from '@/libs/models/IAssistant';
 import { Button, Modal, Table } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { useContext, useMemo } from 'react';
-import { SchedulerContext } from './scheduler/scheduler-base';
+import { type DutySection } from '@prisma/client';
+import { useMemo } from 'react';
 
 interface IExportModal {
-  assistantList: IAssistant[];
-  sectionList: ISection[];
+  assistantList: IDutyAssistant[];
+  sectionList: DutySection[];
 }
 
 export default function ExportModal({ assistantList, sectionList }: Readonly<IExportModal>) {
-  const { monthConfig } = useContext(SchedulerContext);
+  const { monthConfig } = useSchedulerContext();
   const [opened, { open, close }] = useDisclosure(false);
 
   const headerData = useMemo(() => {
@@ -75,7 +75,9 @@ export default function ExportModal({ assistantList, sectionList }: Readonly<IEx
           <Table.Tbody>{rows}</Table.Tbody>
         </Table>
       </Modal>
-      <Button onClick={open}>Export</Button>
+      <Button onClick={open} disabled={sectionList.length === 0 || assistantList.length === 0}>
+        Export
+      </Button>
     </>
   );
 }

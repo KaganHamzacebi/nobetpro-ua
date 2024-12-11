@@ -7,7 +7,7 @@ export default function NewDutyButton() {
   const router = useRouter();
 
   const handleNewDuty = () => {
-    router.push('/dashboard/duty-list/new-duty');
+    router.push('/dashboard/duty-list/new');
   };
 
   return (

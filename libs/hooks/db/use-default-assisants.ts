@@ -1,11 +1,11 @@
 import { showSuccessNotification } from '@/libs/helpers/notification-service';
-import { IDefaultAssistant } from '@/libs/models/IAssistant';
 import {
   createDefaultAssistant,
   deleteDefaultAssistants,
   getDefaultAssistants,
   updateDefaultAssistant
 } from '@/libs/service/default-assistant.service';
+import { DefaultAssistant } from '@prisma/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 const queryKey = ['defaultAssistants'];
@@ -31,7 +31,7 @@ export const useDefaultAssistant = () => {
 };
 
 const useGetQuery = () => {
-  return useQuery<IDefaultAssistant[], Error>({
+  return useQuery<DefaultAssistant[], Error>({
     queryKey: queryKey,
     queryFn: getDefaultAssistants,
     refetchOnWindowFocus: false
@@ -44,7 +44,7 @@ const useCreateQuery = () => {
   return useMutation({
     mutationFn: createDefaultAssistant,
     onSuccess: newDefaultAssistant => {
-      queryClient.setQueryData(queryKey, (prev: IDefaultAssistant[]) => [
+      queryClient.setQueryData(queryKey, (prev: DefaultAssistant[]) => [
         ...prev,
         newDefaultAssistant
       ]);
@@ -62,7 +62,7 @@ const useDeleteQuery = () => {
   return useMutation({
     mutationFn: deleteDefaultAssistants,
     onSuccess: (deletedIds: string[]) => {
-      queryClient.setQueryData(queryKey, (prev: IDefaultAssistant[]) =>
+      queryClient.setQueryData(queryKey, (prev: DefaultAssistant[]) =>
         prev.filter(d => !deletedIds.includes(d.id))
       );
       showSuccessNotification({
@@ -78,8 +78,8 @@ const useUpdateQuery = () => {
 
   return useMutation({
     mutationFn: updateDefaultAssistant,
-    onSuccess: (updatedAssistant: IDefaultAssistant) => {
-      queryClient.setQueryData(queryKey, (prev: IDefaultAssistant[]) =>
+    onSuccess: (updatedAssistant: DefaultAssistant) => {
+      queryClient.setQueryData(queryKey, (prev: DefaultAssistant[]) =>
         prev.map(d => (d.id === updatedAssistant.id ? updatedAssistant : d))
       );
       showSuccessNotification({

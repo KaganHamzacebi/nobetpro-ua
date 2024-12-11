@@ -1,17 +1,17 @@
-import { SchedulerContext } from '@/components/ui/scheduler/scheduler-base';
+import { useSchedulerContext } from '@/components/ui/scheduler/scheduler-base';
 import { ScreenMode } from '@/libs/enums/screen-mode';
 import { getDisabledDays } from '@/libs/helpers/disabled-day-calculator';
 import { GenerateUUID } from '@/libs/helpers/id-generator';
 import { newSelectedDayConfig } from '@/libs/helpers/model-generator';
-import { IAssistant } from '@/libs/models/IAssistant';
-import { ISection } from '@/libs/models/ISection';
+import { IDutyAssistant } from '@/libs/models/IAssistant';
 import { Checkbox, Menu, MenuDropdown, MenuItem, Tooltip } from '@mantine/core';
 import { useDidUpdate } from '@mantine/hooks';
-import { useCallback, useContext, useMemo, useState } from 'react';
+import { DutySection } from '@prisma/client';
+import { useCallback, useMemo, useState } from 'react';
 
 interface IMonthCellRenderer {
   dayIndex: number;
-  assistant: IAssistant;
+  assistant: IDutyAssistant;
 }
 
 export default function MonthCellRenderer({ dayIndex, assistant }: Readonly<IMonthCellRenderer>) {
@@ -21,44 +21,43 @@ export default function MonthCellRenderer({ dayIndex, assistant }: Readonly<IMon
     sectionList,
     setAssistantList,
     selectedDayConfig,
-    setSelectedDayConfig
-  } = useContext(SchedulerContext);
+    setSelectedDayConfig,
+    sectionConfigList
+  } = useSchedulerContext();
   const [opened, setOpened] = useState(false);
 
   const getSelectedSection = () => {
     return sectionList.find(s => s.id === assistant.selectedDays.days[dayIndex]?.id);
   };
 
-  const [selectedSection, setSelectedSection] = useState<ISection | undefined>(
+  const [selectedSection, setSelectedSection] = useState<DutySection | undefined>(
     getSelectedSection()
   );
 
+  const sectionConfig = useMemo(() => {
+    return sectionConfigList.find(i => i.assistantId === assistant.id);
+  }, [assistant.id, sectionConfigList]);
+
   const maxPossibleDutyCount = useMemo(() => {
-    return Object.values(assistant.sectionConfig.counts ?? {}).reduce(
-      (prev, curr) => prev + curr,
-      0
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [assistant.sectionConfig.version]);
+    return Object.values(sectionConfig?.counts ?? {}).reduce((prev, curr) => prev + curr, 0);
+  }, [sectionConfig?.counts]);
 
   const filteredSectionList = useMemo(() => {
     return sectionList.filter(s => {
       const isColumnSelectedByAnotherAssistant = selectedDayConfig[dayIndex]?.sectionIds.has(s.id);
-      const sectionDutyCount = assistant.sectionConfig.counts[s.id] ?? 0;
+      const sectionDutyCount = sectionConfig?.counts[s.id] ?? 0;
       const assistantCountForSection = Object.values(assistant.selectedDays.days).filter(
         section => section.id === s.id
       ).length;
       const isSectionReachedMax = assistantCountForSection === sectionDutyCount;
       return !isColumnSelectedByAnotherAssistant && !isSectionReachedMax;
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    assistant.sectionConfig.version,
-    assistant.selectedDays.version,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    selectedDayConfig[dayIndex]?.version,
+    assistant.selectedDays.days,
     dayIndex,
-    sectionList
+    sectionConfig?.counts,
+    sectionList,
+    selectedDayConfig
   ]);
 
   const isDisabled = useMemo(() => {
@@ -101,7 +100,7 @@ export default function MonthCellRenderer({ dayIndex, assistant }: Readonly<IMon
   }, [assistant.selectedDays.version]);
 
   const selectSection = useCallback(
-    (section: ISection | undefined) => {
+    (section: DutySection | undefined) => {
       const dayConfig = { ...selectedDayConfig };
       if (section) {
         if (dayConfig[dayIndex]) dayConfig[dayIndex].sectionIds.add(section.id);
@@ -140,7 +139,7 @@ export default function MonthCellRenderer({ dayIndex, assistant }: Readonly<IMon
 
   const menuDropdown = (
     <MenuDropdown>
-      {filteredSectionList.map((section: ISection) => (
+      {filteredSectionList.map((section: DutySection) => (
         <MenuItem key={section.id} onClick={() => selectSection(section)}>
           {section.name}
         </MenuItem>

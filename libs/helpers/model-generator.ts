@@ -1,37 +1,63 @@
 import { getRandomColor } from '@/libs/helpers/color-generator';
 import { GenerateUUID } from '@/libs/helpers/id-generator';
-import { SelectedDayConfig } from '@/libs/models/DutyContext';
-import { IAssistant } from '@/libs/models/IAssistant';
-import { ISection } from '@/libs/models/ISection';
+import { IDutyAssistant, ISectionConfig, SelectedDayConfig } from '@/libs/models/IAssistant';
+import { DefaultAssistant, DefaultSection, DutySection } from '@prisma/client';
 
-export const newAssistant = (name?: string): IAssistant => {
+const newAssistant = (defaults: Partial<DefaultAssistant>): IDutyAssistant => {
   return {
     id: GenerateUUID(),
-    name: name ?? 'New Assistant',
+    name: defaults.name ?? 'New Assistant',
     selectedDays: {
       days: []
     },
     disabledDays: {
       days: []
-    },
-    sectionConfig: {
-      counts: {},
-      version: GenerateUUID()
     }
   };
 };
 
-export const newSection = (sectionName?: string): ISection => {
+const newSection = (defaults: Partial<DefaultSection>): DutySection => {
   return {
     id: GenerateUUID(),
-    name: sectionName ?? 'New Section',
-    color: getRandomColor()
+    name: defaults.name ?? 'New Section',
+    color: defaults.color ?? getRandomColor(),
+    createdAt: defaults.createdAt ?? new Date(),
+    dutyId: 'unknown'
   };
 };
 
-export const newSelectedDayConfig = (sectionId: string): SelectedDayConfig[number] => {
+const newDefaultSection = (defaults: Partial<DefaultSection>): DefaultSection => {
+  return {
+    id: GenerateUUID(),
+    name: defaults.name ?? 'New Default Section',
+    createdAt: defaults.createdAt ?? new Date(),
+    defaultValue: defaults.defaultValue ?? 0,
+    color: defaults.color ?? null,
+    userId: 'unknown'
+  };
+};
+
+const newSelectedDayConfig = (sectionId: string): SelectedDayConfig[number] => {
   return {
     sectionIds: new Set<string>([sectionId]),
     version: GenerateUUID()
   };
+};
+
+const newSectionConfiguration = (
+  assistantId: string,
+  counts?: Record<string, number>
+): ISectionConfig => {
+  return {
+    assistantId: assistantId,
+    counts: counts ?? {}
+  };
+};
+
+export {
+  newAssistant,
+  newDefaultSection,
+  newSection,
+  newSectionConfiguration,
+  newSelectedDayConfig
 };

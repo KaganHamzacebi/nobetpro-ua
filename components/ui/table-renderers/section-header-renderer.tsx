@@ -1,15 +1,15 @@
-import { ISection } from '@/libs/models/ISection';
+import { useSchedulerContext } from '@/components/ui/scheduler/scheduler-base';
 import { ActionIcon, Group, TextInput, Tooltip } from '@mantine/core';
 import { useDebouncedCallback, useDidUpdate } from '@mantine/hooks';
+import { DutySection } from '@prisma/client';
 import { IconTrashFilled } from '@tabler/icons-react';
-import { ChangeEvent, useCallback, useContext, useMemo, useState } from 'react';
+import { ChangeEvent, useCallback, useMemo, useState } from 'react';
 import DSColorPicker from '../color-picker';
-import { SchedulerContext } from '../scheduler/scheduler-base';
 
 interface ISectionHeaderRenderer {
-  section: ISection;
-  setSectionProps: (sectionId: ISection['id'], props: Partial<ISection>) => void;
-  removeSection: (sectionId: ISection['id']) => void;
+  section: DutySection;
+  setSectionProps: (sectionId: DutySection['id'], props: Partial<DutySection>) => void;
+  removeSection: (sectionId: DutySection['id']) => void;
 }
 
 const getBackgroundClass = (totalDayCount: number, datesInMonth: number) => {
@@ -23,23 +23,23 @@ export default function SectionHeaderRenderer({
   setSectionProps,
   removeSection
 }: Readonly<ISectionHeaderRenderer>) {
-  const { monthConfig, assistantList } = useContext(SchedulerContext);
+  const { monthConfig, sectionConfigList } = useSchedulerContext();
 
   const [fields, setFields] = useState({
     color: section.color,
     name: section.name
   });
 
-  const setDebouncedFields = useDebouncedCallback((props: Partial<ISection>) => {
+  const setDebouncedFields = useDebouncedCallback((props: Partial<DutySection>) => {
     setSectionProps(section.id, props);
   }, 500);
 
   const totalDayCount = useMemo(() => {
-    return assistantList.reduce((prev, curr) => {
-      prev += curr.sectionConfig.counts[section.id] ?? 0;
+    return sectionConfigList.reduce((prev, curr) => {
+      prev += curr.counts[section.id] ?? 0;
       return prev;
     }, 0);
-  }, [assistantList]);
+  }, [section.id, sectionConfigList]);
 
   useDidUpdate(() => {
     setDebouncedFields({ color: fields.color });

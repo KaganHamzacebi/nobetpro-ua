@@ -1,13 +1,13 @@
-import { IAssistant } from '@/libs/models/IAssistant';
+import { IDutyAssistant } from '@/libs/models/IAssistant';
 import { ActionIcon, TextInput, Tooltip } from '@mantine/core';
 import { useDebouncedCallback, useDidUpdate } from '@mantine/hooks';
 import { IconTrashFilled } from '@tabler/icons-react';
 import { useState } from 'react';
 
 interface IAssistantNameRenderer {
-  assistant: IAssistant;
-  setAssistantProps: (id: string, props: Partial<IAssistant>) => void;
-  removeAssistant: (id: IAssistant) => void;
+  assistant: IDutyAssistant;
+  setAssistantProps: (id: string, props: Partial<IDutyAssistant>) => void;
+  removeAssistant: (id: IDutyAssistant) => void;
 }
 
 export default function AssistantNameRenderer({

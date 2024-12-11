@@ -1,29 +1,21 @@
-'use client';
+import SchedulerModal from '@/components/ui/scheduler/scheduler-modal';
+import prisma from '@/libs/db/prisma';
+import { getUser } from '@/libs/supabase/server';
 
-import SchedulerBase from '@/components/ui/scheduler/scheduler-base';
-import { Modal } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
-import { useRouter } from 'next/navigation';
+export default async function SchedulerPage() {
+  const user = await getUser();
 
-export default function SchedulerModal() {
-  const router = useRouter();
-  const [opened] = useDisclosure(true);
+  const defaultAssistants = await prisma.defaultAssistant.findMany({
+    where: {
+      userId: user?.id
+    }
+  });
 
-  const handleOnModalClose = () => {
-    router.back();
-  };
+  const defaultSections = await prisma.defaultSection.findMany({
+    where: {
+      userId: user?.id
+    }
+  });
 
-  return (
-    <Modal
-      opened={opened}
-      onClose={handleOnModalClose}
-      title="Schedule Duties"
-      size="auto"
-      centered
-      className="h-[85vh] min-h-[85vh]">
-      <Modal.Body>
-        <SchedulerBase />
-      </Modal.Body>
-    </Modal>
-  );
+  return <SchedulerModal defaultAssistants={defaultAssistants} defaultSections={defaultSections} />;
 }
