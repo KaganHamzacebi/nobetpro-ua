@@ -9,7 +9,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "prettier": "prettier --write ."
+    "prettier": "prettier --write .",
+    "prepare": "husky"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^17.0.0",
@@ -50,7 +51,7 @@
     "eslint-config-next": "15.0.2",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
-    "husky": "^9.1.5",
+    "husky": "^9.1.7",
     "lint-staged": "^15.2.10",
     "mini-css-extract-plugin": "^2.9.2",
     "postcss": "^8.4.47",
