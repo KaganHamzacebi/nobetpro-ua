@@ -6,12 +6,10 @@ import { redirect } from 'next/navigation';
 import { NotificationType } from '../enums/NotificationType';
 import { createClient } from './server';
 
-const supabase = createClient();
-const origin = headers().get('origin');
-
 const successLoginNext = `/dashboard/duty-list?${NotificationType.LoginSuccess}=true`;
 
 export const emailLogin = async (formData: { email: string; password: string }) => {
+  const supabase = await createClient();
   const credentials = {
     email: formData.email,
     password: formData.password
@@ -28,8 +26,7 @@ export const emailLogin = async (formData: { email: string; password: string }) 
 };
 
 export async function emailSignup(formData: { email: string; password: string }) {
-  const supabase = createClient();
-
+  const supabase = await createClient();
   const credentials = {
     email: formData.email,
     password: formData.password
@@ -46,12 +43,15 @@ export async function emailSignup(formData: { email: string; password: string })
 }
 
 export const resetPassword = async (email: string) => {
-  const supabase = createClient();
+  const supabase = await createClient();
   await supabase.auth.resetPasswordForEmail(email);
   redirect('/paswordReset=true');
 };
 
 export const googleLogin = async () => {
+  const supabase = await createClient();
+  const origin = (await headers()).get('origin');
+
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
@@ -65,7 +65,7 @@ export const googleLogin = async () => {
 };
 
 export const signOut = async () => {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { error } = await supabase.auth.signOut();
   if (!error) {
     redirect('/');

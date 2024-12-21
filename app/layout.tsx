@@ -25,7 +25,9 @@ export default async function RootLayout({ children }: Readonly<IRootLayout>) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script src="https://unpkg.com/react-scan/dist/auto.global.js" async></script>
+        {process.env.NODE_ENV === 'development' && (
+          <script src="https://unpkg.com/react-scan/dist/auto.global.js" async />
+        )}
         <title>Nöbet Pro</title>
         <ColorSchemeScript />
         <meta
