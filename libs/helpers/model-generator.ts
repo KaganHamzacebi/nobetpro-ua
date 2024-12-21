@@ -1,63 +1,86 @@
 import { getRandomColor } from '@/libs/helpers/color-generator';
 import { GenerateUUID } from '@/libs/helpers/id-generator';
-import { IDutyAssistant, ISectionConfig, SelectedDayConfig } from '@/libs/models/IAssistant';
-import { DefaultAssistant, DefaultSection, DutySection } from '@prisma/client';
+import { DefaultMonthConfig } from '@/libs/mock/duty.data';
+import {
+  IAssistantSectionConfig,
+  IDefaultAssistant,
+  IDefaultSection,
+  IDuty,
+  IDutyAssistant,
+  IDutySection
+} from '@/libs/models/duty-model';
 
-const newAssistant = (defaults: Partial<DefaultAssistant>): IDutyAssistant => {
+const NewDuty = (
+  defaultAssistants: IDefaultAssistant[],
+  defaultSections: IDefaultSection[]
+): IDuty => {
+  const dutySections: IDutySection[] = defaultSections.map(section =>
+    NewDutySection({
+      ...(section as IDutySection),
+      id: GenerateUUID()
+    })
+  );
+
+  const dutyAssistants: IDutyAssistant[] = defaultAssistants.map(assistant =>
+    NewDutyAssistant(assistant)
+  );
+
+  const assistantSectionConfig = dutyAssistants.flatMap(assistant => {
+    return dutySections.map(section =>
+      NewAssistantSectionConfig(assistant.id, section.id, section.defaultValue)
+    );
+  });
+
+  return {
+    assistantList: dutyAssistants,
+    sectionList: dutySections,
+    assistantSectionConfig: assistantSectionConfig,
+    daySectionState: {},
+    monthConfig: DefaultMonthConfig,
+    numberOfRestDays: 2
+  };
+};
+
+const NewDutyAssistant = (defaults?: Partial<IDutyAssistant>): IDutyAssistant => {
   return {
     id: GenerateUUID(),
-    name: defaults.name ?? 'New Assistant',
-    selectedDays: {
-      days: []
-    },
-    disabledDays: {
-      days: []
-    }
+    name: defaults?.name ?? 'New Assistant',
+    disabledDays: defaults?.disabledDays ?? [],
+    unwantedDays: defaults?.unwantedDays ?? []
   };
 };
 
-const newSection = (defaults: Partial<DefaultSection>): DutySection => {
+const NewDutySection = (defaults?: Partial<IDutySection>): IDutySection => {
   return {
     id: GenerateUUID(),
-    name: defaults.name ?? 'New Section',
-    color: defaults.color ?? getRandomColor(),
-    createdAt: defaults.createdAt ?? new Date(),
-    dutyId: 'unknown'
+    name: defaults?.name ?? 'New Section',
+    color: defaults?.color ?? getRandomColor(),
+    defaultValue: defaults?.defaultValue ?? 0
   };
 };
 
-const newDefaultSection = (defaults: Partial<DefaultSection>): DefaultSection => {
-  return {
-    id: GenerateUUID(),
-    name: defaults.name ?? 'New Default Section',
-    createdAt: defaults.createdAt ?? new Date(),
-    defaultValue: defaults.defaultValue ?? 0,
-    color: defaults.color ?? null,
-    userId: 'unknown'
-  };
-};
-
-const newSelectedDayConfig = (sectionId: string): SelectedDayConfig[number] => {
-  return {
-    sectionIds: new Set<string>([sectionId]),
-    version: GenerateUUID()
-  };
-};
-
-const newSectionConfiguration = (
+const NewAssistantSectionConfig = (
   assistantId: string,
-  counts?: Record<string, number>
-): ISectionConfig => {
+  sectionId: string,
+  totalLimit = 0
+): IAssistantSectionConfig => {
   return {
     assistantId: assistantId,
-    counts: counts ?? {}
+    sectionId: sectionId,
+    totalLimit: totalLimit
   };
+};
+
+const NewAssistantSectionConfigList = (assistantId: string, sectionList: IDutySection[]) => {
+  return sectionList.map(section =>
+    NewAssistantSectionConfig(assistantId, section.id, section.defaultValue)
+  );
 };
 
 export {
-  newAssistant,
-  newDefaultSection,
-  newSection,
-  newSectionConfiguration,
-  newSelectedDayConfig
+  NewAssistantSectionConfig,
+  NewAssistantSectionConfigList,
+  NewDuty,
+  NewDutyAssistant,
+  NewDutySection
 };

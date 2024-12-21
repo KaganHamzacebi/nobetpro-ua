@@ -1,28 +1,31 @@
 import ExportModal from '@/components/ui/export-modal';
-import { useSchedulerContext } from '@/components/ui/scheduler/scheduler-base';
 import { ScreenMode } from '@/libs/enums/screen-mode';
+import { useDutyStore } from '@/libs/stores/use-duty-store';
 import { Group, NumberInput, SegmentedControl } from '@mantine/core';
-import { DateValue, MonthPickerInput } from '@mantine/dates';
+import { MonthPickerInput } from '@mantine/dates';
 import { IconCalendar } from '@tabler/icons-react';
 import dayjs from 'dayjs';
-import { useMemo } from 'react';
+import { memo } from 'react';
 
-interface ISchedulerTopBar {
-  onDateChange: (newDate: DateValue) => void;
-  setNumberOfRestDays: (restDays: string | number) => void;
-  handleScreenModeChange: (screenMode: ScreenMode) => void;
-}
+function SchedulerTopBar() {
+  console.log('scheduler top bar renderin');
+  const setDate = useDutyStore.use.setDate();
+  const setRestDays = useDutyStore.use.setRestDays();
+  const setScreenMode = useDutyStore.use.setScreenMode();
+  const numberOfRestDays = useDutyStore.use.numberOfRestDays();
 
-export default function SchedulerTopBar({
-  onDateChange,
-  setNumberOfRestDays,
-  handleScreenModeChange
-}: Readonly<ISchedulerTopBar>) {
-  const { monthConfig, assistantList, sectionList } = useSchedulerContext();
+  const handleScreenModeChange = (mode: ScreenMode) => {
+    setScreenMode(mode);
+  };
 
-  const isRestDayDayDisabled = useMemo(() => {
-    return false;
-  }, []);
+  const handleRestDayChange = (value: string | number) => {
+    setRestDays(Number(value));
+  };
+
+  const onDateChange = (date: Date | null) => {
+    if (date == null) throw new Error('Date cannot be null');
+    setDate(date);
+  };
 
   return (
     <Group>
@@ -40,16 +43,15 @@ export default function SchedulerTopBar({
       <NumberInput
         className="w-fit"
         label="Number of Rest days"
-        value={monthConfig.numberOfRestDays}
-        onChange={setNumberOfRestDays}
+        value={numberOfRestDays}
+        onChange={handleRestDayChange}
         min={0}
-        disabled={isRestDayDayDisabled}
         clampBehavior="strict"
         allowNegative={false}
         allowDecimal={false}
       />
       <div className="ml-auto mt-auto flex flex-row gap-x-4">
-        <ExportModal assistantList={assistantList} sectionList={sectionList} />
+        <ExportModal />
         <SegmentedControl
           defaultValue={ScreenMode.MonthPicker}
           onChange={e => handleScreenModeChange(e as ScreenMode)}
@@ -67,3 +69,5 @@ export default function SchedulerTopBar({
     </Group>
   );
 }
+
+export default memo(SchedulerTopBar);

@@ -5,7 +5,7 @@ import { ColorPicker, ColorSwatch, Menu } from '@mantine/core';
 import { useCallback, useState } from 'react';
 
 interface IDSColorPicker {
-  color: string | null;
+  color?: string;
   onClose?: (color: string) => void;
   onChange?: (color: string) => void;
 }
@@ -15,7 +15,7 @@ export default function DSColorPicker({
   onClose,
   onChange
 }: Readonly<IDSColorPicker>) {
-  const [color, setColor] = useState<string | null>(initialColor);
+  const [color, setColor] = useState(initialColor);
 
   const handleOnClose = useCallback(() => {
     onClose?.(color ?? '');

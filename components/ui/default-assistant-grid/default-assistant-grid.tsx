@@ -1,12 +1,12 @@
 'use client';
 
 import { caseInsensitiveSorter } from '@/libs/helpers/case-insensitive-sorter.helper';
-import { useDefaultAssistant } from '@/libs/hooks/db/use-default-assisants';
+import { useDefaultAssistant } from '@/libs/hooks/use-default-assisants';
 import {
   OnCreatingRowSave,
   RenderRowActions,
   RenderTopToolbarCustomActions
-} from '@/libs/models/MRTGridTypes';
+} from '@/libs/models/mrt-model';
 import { Button, Group, Text, UnstyledButton } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { DefaultAssistant } from '@prisma/client';

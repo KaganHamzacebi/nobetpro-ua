@@ -25,6 +25,7 @@ export default async function RootLayout({ children }: Readonly<IRootLayout>) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <script src="https://unpkg.com/react-scan/dist/auto.global.js" async></script>
         <title>Nöbet Pro</title>
         <ColorSchemeScript />
         <meta
@@ -33,10 +34,10 @@ export default async function RootLayout({ children }: Readonly<IRootLayout>) {
         />
       </head>
       <body className={`${inter.className} min-h-screen`}>
+        <Metrics />
         <Providers user={user}>
           <Shell>{children}</Shell>
         </Providers>
-        <Metrics />
       </body>
     </html>
   );

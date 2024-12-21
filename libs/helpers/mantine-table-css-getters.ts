@@ -1,17 +1,16 @@
+import { IDuty, IDutyAssistant } from '@/libs/models/duty-model';
 import { ScreenMode } from '../enums/screen-mode';
-import { MonthConfig } from '../models/MonthConfig';
 
-export const monthCellCssClasses = (
-  index: number,
-  asssitantId: string,
-  monthConfig: MonthConfig,
-  unwantedDays: Record<string, boolean>,
+const monthCellCssClasses = (
+  dayIndex: number,
+  monthConfig: IDuty['monthConfig'],
+  unwantedDays: IDutyAssistant['unwantedDays'],
   screenMode: ScreenMode
 ) => {
   const classes: string[] = [];
 
-  const isWeekend = monthConfig.weekendIndexes.includes(index);
-  const isUnwanted = unwantedDays[`${asssitantId}-${index}`];
+  const isWeekend = monthConfig.weekendIndexes.includes(dayIndex);
+  const isUnwanted = unwantedDays?.includes(dayIndex) ?? false;
   const isUnwantedMode = screenMode === ScreenMode.UnwantedDayPicker;
 
   if (isWeekend && isUnwanted) classes.push('bg-attention-700');
@@ -21,3 +20,11 @@ export const monthCellCssClasses = (
 
   return classes.join(' ');
 };
+
+const sectionHeaderDateCountColor = (totalDayCount: number, datesInMonth: number) => {
+  if (totalDayCount < datesInMonth) return 'bg-onyx';
+  if (totalDayCount === datesInMonth) return 'bg-success';
+  return 'bg-attention-700';
+};
+
+export { monthCellCssClasses, sectionHeaderDateCountColor };

@@ -1,36 +1,49 @@
 'use client';
 
-import SchedulerBase from '@/components/ui/scheduler/scheduler-base';
-import { Modal } from '@mantine/core';
+import Scheduler from '@/components/ui/scheduler/scheduler';
+import { IDuty } from '@/libs/models/duty-model';
+import { Modal, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { DefaultAssistant, DefaultSection } from '@prisma/client';
-import { useParams, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { modals } from '@mantine/modals';
+import { IconX } from '@tabler/icons-react';
+import { useRouter } from 'next/navigation';
 
 interface ISchedulerModal {
-  defaultAssistants: DefaultAssistant[];
-  defaultSections: DefaultSection[];
+  duty: IDuty;
 }
 
-export default function SchedulerModal({
-  defaultAssistants,
-  defaultSections
-}: Readonly<ISchedulerModal>) {
-  const { id } = useParams();
+export default function SchedulerModal({ duty }: Readonly<ISchedulerModal>) {
   const router = useRouter();
-  const [opened] = useDisclosure(true);
+  const [opened, handlers] = useDisclosure(true);
 
   const handleOnModalClose = () => {
-    router.back();
-  };
+    const close = () => {
+      handlers.close();
+      router.back();
+    };
 
-  useEffect(() => {
-    console.log(id);
-  }, [id]);
+    modals.openConfirmModal({
+      title: 'Close Without Saving?',
+      centered: true,
+      labels: { confirm: 'Yes', cancel: 'Cancel' },
+      confirmProps: { color: 'red' },
+      children: (
+        <Text size="sm">
+          You have unsaved changes. Closing this modal will discard them. Do you want to proceed?
+        </Text>
+      ),
+      onConfirm: close
+    });
+  };
 
   return (
     <Modal
       opened={opened}
+      closeButtonProps={{
+        icon: <IconX color="red" size={20} stroke={2} />
+      }}
+      closeOnClickOutside={false}
+      closeOnEscape={false}
       onClose={handleOnModalClose}
       title="Schedule Duties"
       size="100%"
@@ -41,12 +54,7 @@ export default function SchedulerModal({
         }
       }}>
       <Modal.Body>
-        <SchedulerBase
-          duty={undefined}
-          defaultSectionConfig={[]}
-          defaultAssistants={[]}
-          defaultSections={[]}
-        />
+        <Scheduler defaultDuty={duty} />
       </Modal.Body>
     </Modal>
   );

@@ -1,14 +1,13 @@
 import { getWeekendDayIndexes } from '@/libs/helpers/get-weekend-indexes';
-import { MonthConfig } from '@/libs/models/MonthConfig';
+import { IDutyMonthConfig } from '@/libs/models/duty-model';
 import dayjs from 'dayjs';
 
 const now = dayjs();
 
-const DefaultMonthConfig: MonthConfig = {
+const DefaultMonthConfig: IDutyMonthConfig = {
   selectedDate: now.startOf('month').toDate(),
   datesInMonth: now.daysInMonth(),
-  weekendIndexes: getWeekendDayIndexes(new Date()),
-  numberOfRestDays: 2
+  weekendIndexes: getWeekendDayIndexes(new Date())
 };
 
 export { DefaultMonthConfig };
