@@ -62,7 +62,7 @@ function SectionHeaderRenderer({ section }: Readonly<ISectionHeaderRenderer>) {
   return (
     <Group className="w-full min-w-[200px]" gap={8} wrap="nowrap">
       <TextInput size="xs" value={fields.name} onChange={handleNameChange} />
-      <DSColorPicker onClose={handleColorChange} color={fields.color as string | undefined} />
+      <DSColorPicker onClose={handleColorChange} color={fields.color as string} />
       <TrashButton callback={handleRemoveSection} />
       <div
         className={`flex flex-row gap-x-1 rounded px-2 py-1 ${sectionHeaderDateCountColor(totalDayCount, monthConfig.datesInMonth)}`}>

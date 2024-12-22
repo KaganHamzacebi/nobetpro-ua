@@ -19,7 +19,7 @@ export const updateSession = async (request: NextRequest) => {
       }
     });
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // This will refresh session if expired - required for Server Components
     // https://supabase.com/docs/guides/auth/server-side/nextjs

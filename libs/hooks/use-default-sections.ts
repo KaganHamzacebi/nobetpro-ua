@@ -1,4 +1,5 @@
 import { showSuccessNotification } from '@/libs/helpers/notification-service';
+import { IDefaultSection } from '@/libs/models/duty-model';
 import {
   createDefaultSection,
   deleteDefaultSections,
@@ -31,7 +32,7 @@ export const useDefaultSection = () => {
 };
 
 const useGetQuery = () => {
-  return useQuery<DefaultSection[], Error>({
+  return useQuery<IDefaultSection[], Error>({
     queryKey: queryKey,
     queryFn: getDefaultSections,
     refetchOnWindowFocus: false

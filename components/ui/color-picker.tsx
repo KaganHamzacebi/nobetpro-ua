@@ -5,7 +5,7 @@ import { ColorPicker, ColorSwatch, Menu } from '@mantine/core';
 import { useCallback, useState } from 'react';
 
 interface IDSColorPicker {
-  color?: string;
+  color: string | null;
   onClose?: (color: string) => void;
   onChange?: (color: string) => void;
 }

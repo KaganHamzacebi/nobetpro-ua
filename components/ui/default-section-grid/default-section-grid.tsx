@@ -1,7 +1,9 @@
 'use client';
 
 import { caseInsensitiveSorter } from '@/libs/helpers/case-insensitive-sorter.helper';
+import { GenerateUUID } from '@/libs/helpers/id-generator';
 import { useDefaultSection } from '@/libs/hooks/use-default-sections';
+import { IDefaultSection } from '@/libs/models/duty-model';
 import {
   OnCreatingRowSave,
   RenderRowActions,
@@ -9,7 +11,6 @@ import {
 } from '@/libs/models/mrt-model';
 import { Button, Group, NumberInput, Text, UnstyledButton } from '@mantine/core';
 import { modals } from '@mantine/modals';
-import { type DefaultSection } from '@prisma/client';
 import { IconTrash } from '@tabler/icons-react';
 import {
   MantineReactTable,
@@ -22,7 +23,7 @@ import { useCallback, useMemo, useState } from 'react';
 import DSColorPicker from '../color-picker';
 
 export default function DefaultSectionGrid() {
-  const [creatingState, setCreatingState] = useState<Partial<DefaultSection>>({
+  const [creatingState, setCreatingState] = useState({
     color: '',
     defaultValue: 0
   });
@@ -37,10 +38,11 @@ export default function DefaultSectionGrid() {
   } = useDefaultSection();
 
   // CREATE action
-  const onCreatingRowSave = useCallback<OnCreatingRowSave<DefaultSection>>(
+  const onCreatingRowSave = useCallback<OnCreatingRowSave<IDefaultSection>>(
     ({ values, exitCreatingMode }) => {
       const handleCreation = async () => {
         await createDefaultSection({
+          id: GenerateUUID(),
           name: values.name,
           defaultValue: creatingState.defaultValue,
           color: creatingState.color
@@ -56,10 +58,10 @@ export default function DefaultSectionGrid() {
   // Explicitly type the function
   const handleUpdateSection = useCallback(
     (
-      table: MRT_TableInstance<DefaultSection>,
-      row: MRT_Row<DefaultSection>,
+      table: MRT_TableInstance<IDefaultSection>,
+      row: MRT_Row<IDefaultSection>,
       value: unknown,
-      field: keyof DefaultSection
+      field: keyof IDefaultSection
     ): void => {
       // If currently creating a section, bypass the update logic
       const isCreating = !!table.getState().creatingRow; // Ensure 'table' is properly typed
@@ -77,7 +79,7 @@ export default function DefaultSectionGrid() {
 
   // DELETE action
   const handleDeleteSelectedDefaultSections = useCallback(
-    async (table: MRT_TableInstance<DefaultSection>) => {
+    async (table: MRT_TableInstance<IDefaultSection>) => {
       const idsToDelete = Object.keys(table.getSelectedRowModel().rowsById);
       if (idsToDelete.length == 0) {
         throw new Error('There is no selected sections to delete');
@@ -90,7 +92,7 @@ export default function DefaultSectionGrid() {
   );
 
   const deleteSection = useCallback(
-    async (defaultSectionId: string, table: MRT_TableInstance<DefaultSection>) => {
+    async (defaultSectionId: string, table: MRT_TableInstance<IDefaultSection>) => {
       await deleteDefaultSection([defaultSectionId]);
       table.resetRowSelection();
     },
@@ -114,7 +116,7 @@ export default function DefaultSectionGrid() {
   }, []);
 
   const handleCreationValues = useCallback(
-    <T extends keyof DefaultSection>(value: DefaultSection[T], field: T, isCreating: boolean) => {
+    <T extends keyof IDefaultSection>(value: IDefaultSection[T], field: T, isCreating: boolean) => {
       if (isCreating) {
         setCreatingState(prev => ({
           ...prev,
@@ -125,7 +127,7 @@ export default function DefaultSectionGrid() {
     []
   );
 
-  const columns = useMemo<MRT_ColumnDef<DefaultSection>[]>(
+  const columns = useMemo<MRT_ColumnDef<IDefaultSection>[]>(
     () => [
       {
         accessorKey: 'name',
@@ -156,7 +158,13 @@ export default function DefaultSectionGrid() {
         header: 'Color',
         sortingFn: caseInsensitiveSorter,
         enableEditing: false,
-        Cell: ({ row, table }) => (
+        Cell: ({
+          row,
+          table
+        }: {
+          row: MRT_Row<IDefaultSection>;
+          table: MRT_TableInstance<IDefaultSection>;
+        }) => (
           <DSColorPicker
             color={row.original.color}
             onChange={value => handleCreationValues(value, 'color', !row.original.id)}
@@ -168,12 +176,12 @@ export default function DefaultSectionGrid() {
     [handleCreationValues, handleUpdateSection]
   );
 
-  const openEditingRow = useCallback((table: MRT_TableInstance<DefaultSection>) => {
+  const openEditingRow = useCallback((table: MRT_TableInstance<IDefaultSection>) => {
     table.setCreatingRow(true);
   }, []);
 
   // Top Toolbar Custom Actions
-  const renderTopToolbarCustomActions = useCallback<RenderTopToolbarCustomActions<DefaultSection>>(
+  const renderTopToolbarCustomActions = useCallback<RenderTopToolbarCustomActions<IDefaultSection>>(
     ({ table }) => (
       <Group>
         <Button onClick={() => openEditingRow(table)}>New Section</Button>
@@ -190,7 +198,7 @@ export default function DefaultSectionGrid() {
   );
 
   // Row Actions
-  const renderRowActions = useCallback<RenderRowActions<DefaultSection>>(
+  const renderRowActions = useCallback<RenderRowActions<IDefaultSection>>(
     ({ row, table }) => (
       <Group content="center">
         <UnstyledButton
@@ -203,7 +211,7 @@ export default function DefaultSectionGrid() {
     [askForDeletion, deleteSection]
   );
 
-  const table = useMantineReactTable<DefaultSection>({
+  const table = useMantineReactTable<IDefaultSection>({
     columns: columns,
     data: defaultSectionList,
     enableEditing: true,
