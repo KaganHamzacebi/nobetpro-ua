@@ -5,6 +5,8 @@ import { GenerateUUID } from '@/libs/helpers/id-generator';
 import { useDefaultSection } from '@/libs/hooks/use-default-sections';
 import { IDefaultSection } from '@/libs/models/duty-model';
 import {
+  IMRT_Cell,
+  IMRT_Edit,
   OnCreatingRowSave,
   RenderRowActions,
   RenderTopToolbarCustomActions
@@ -142,7 +144,7 @@ export default function DefaultSectionGrid() {
         accessorKey: 'defaultValue',
         header: 'Value',
         sortingFn: caseInsensitiveSorter,
-        Edit: ({ row, table }) => (
+        Edit: ({ row, table }: IMRT_Edit<IDefaultSection>) => (
           <NumberInput
             defaultValue={row.original.defaultValue}
             allowNegative={false}
@@ -158,13 +160,7 @@ export default function DefaultSectionGrid() {
         header: 'Color',
         sortingFn: caseInsensitiveSorter,
         enableEditing: false,
-        Cell: ({
-          row,
-          table
-        }: {
-          row: MRT_Row<IDefaultSection>;
-          table: MRT_TableInstance<IDefaultSection>;
-        }) => (
+        Cell: ({ row, table }: IMRT_Cell<IDefaultSection>) => (
           <DSColorPicker
             color={row.original.color}
             onChange={value => handleCreationValues(value, 'color', !row.original.id)}

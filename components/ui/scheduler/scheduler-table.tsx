@@ -1,12 +1,8 @@
 import { ScreenMode } from '@/libs/enums/screen-mode';
 import { IDutyAssistant } from '@/libs/models/duty-model';
+import { IMRT_Cell } from '@/libs/models/mrt-model';
 import { useDutyStore } from '@/libs/stores/use-duty-store';
-import {
-  MantineReactTable,
-  MRT_ColumnDef,
-  MRT_Row,
-  useMantineReactTable
-} from 'mantine-react-table';
+import { MantineReactTable, MRT_ColumnDef, useMantineReactTable } from 'mantine-react-table';
 import dynamic from 'next/dynamic';
 import { memo, useMemo } from 'react';
 
@@ -41,7 +37,7 @@ function SchedulerTable() {
       id: 'assistant_name',
       accessorKey: 'name',
       header: 'Assistant',
-      Cell: ({ row }: { row: MRT_Row<IDutyAssistant> }) => (
+      Cell: ({ row }: IMRT_Cell<IDutyAssistant>) => (
         <AssistantNameRenderer key={`assistant_name-${row.original.id}`} assistant={row.original} />
       )
     }),
@@ -66,7 +62,7 @@ function SchedulerTable() {
         mantineTableBodyCellProps: {
           className: `${monthConfig.weekendIndexes.includes(index) ? 'bg-onyx' : undefined}`
         },
-        Cell: ({ row }: { row: MRT_Row<IDutyAssistant> }) => (
+        Cell: ({ row }: IMRT_Cell<IDutyAssistant>) => (
           <MonthCellRenderer
             key={`month_cell-${row.original.id}-${index}`}
             dayIndex={index}
@@ -83,7 +79,7 @@ function SchedulerTable() {
         id: 'section-column-' + section.id,
         header: 'Section',
         Header: <SectionHeaderRenderer section={section} />,
-        Cell: ({ row }: { row: MRT_Row<IDutyAssistant> }) => (
+        Cell: ({ row }: IMRT_Cell<IDutyAssistant>) => (
           <SectionCellRenderer
             key={`section_cell_${row.original.id}-${section.id}`}
             assistantId={row.original.id}
