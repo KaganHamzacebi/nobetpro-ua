@@ -1,7 +1,7 @@
 import { ScreenMode } from '@/libs/enums/screen-mode';
 import { IDutySection } from '@/libs/models/duty-model';
 import { useDutyStore } from '@/libs/stores/use-duty-store';
-import { Center, Checkbox, Menu, MenuDropdown, MenuItem } from '@mantine/core';
+import { Center, Checkbox, Menu, MenuDropdown, MenuItem, Tooltip } from '@mantine/core';
 import { FC, memo, useMemo, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
@@ -11,13 +11,13 @@ interface IMonthCellRenderer {
 }
 
 const SectionDropdown: FC<{
-  sectionList: IDutySection[];
-  setSection: (section: IDutySection) => void;
-}> = ({ sectionList, setSection }) => {
+  sections: IDutySection[];
+  onSelectSection: (section: IDutySection) => void;
+}> = ({ sections, onSelectSection }) => {
   return (
     <MenuDropdown>
-      {sectionList.map(section => (
-        <MenuItem key={section.id} onClick={setSection.bind(this, section)}>
+      {sections.map(section => (
+        <MenuItem key={section.id} onClick={() => onSelectSection(section)}>
           {section.name}
         </MenuItem>
       ))}
@@ -26,26 +26,33 @@ const SectionDropdown: FC<{
 };
 
 const CheckboxComponent: FC<{
-  selectedSection?: IDutySection;
-  onCheckboxChangeHandler: (isChecked: boolean) => void;
-  isDisabled: boolean;
-}> = ({ selectedSection, onCheckboxChangeHandler, isDisabled }) => {
-  if (isDisabled) return;
-
+  isChecked: boolean;
+  color: string;
+  tooltip?: string;
+  onChange: (isChecked: boolean) => void;
+}> = ({ isChecked, color, tooltip, onChange }) => {
   return (
     <Menu.Target>
-      <Checkbox
-        checked={!!selectedSection}
-        onChange={e => onCheckboxChangeHandler(e.currentTarget.checked)}
-        color={selectedSection?.color ?? 'green'}
-      />
+      <Tooltip disabled={!tooltip} label={tooltip} color={color}>
+        <Checkbox
+          checked={isChecked}
+          color={color}
+          onChange={e => onChange(e.currentTarget.checked)}
+        />
+      </Tooltip>
     </Menu.Target>
   );
 };
 
 function MonthCellRenderer({ dayIndex, assistantId }: Readonly<IMonthCellRenderer>) {
-  const [opened, setOpened] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  console.log('render');
+
   const screenMode = useDutyStore.use.screenMode();
+  const selectDay = useDutyStore.use.selectDay();
+  const unselectDay = useDutyStore.use.unselectDay();
+  const sectionList = useDutyStore.use.sectionList();
 
   const selectedDay = useDutyStore(
     useShallow(state =>
@@ -53,50 +60,65 @@ function MonthCellRenderer({ dayIndex, assistantId }: Readonly<IMonthCellRendere
     )
   );
 
-  const selectDay = useDutyStore.use.selectDay();
-  const unselectDay = useDutyStore.use.unselectDay();
-  const sectionList = useDutyStore.use.sectionList();
-  const isDisabledDay = useDutyStore(
-    useShallow(state => state.disabledDays[assistantId]?.includes(dayIndex))
+  const assistantSelectedDays = useDutyStore(
+    useShallow(state => state.selectedDays.filter(day => day.assistantId === assistantId))
   );
 
-  console.log(isDisabledDay);
-
-  const assistantSectionConfig = useDutyStore(
+  const selectedSectionsForDay = useDutyStore(
     useShallow(state =>
-      state.assistantSectionConfig.filter(config => config.assistantId === assistantId)
+      state.selectedDays.filter(day => day.dayIndex === dayIndex).map(d => d.section)
     )
   );
 
-  const isDisabled = useMemo(() => {
-    return isDisabledDay || assistantSectionConfig.length === 0;
-  }, [assistantSectionConfig.length, isDisabledDay]);
+  const assistantSectionConfig = useDutyStore(
+    useShallow(state => state.assistantSectionConfig.filter(c => c.assistantId === assistantId))
+  );
 
-  const handleSelect = (section: IDutySection) => {
-    if (section) {
-      selectDay(assistantId, section, dayIndex);
-      setOpened(false);
-    }
-  };
+  const isDayDisabled = useDutyStore(
+    useShallow(state => state.disabledDays[assistantId]?.includes(dayIndex))
+  );
 
-  const onCheckboxChangeHandler = (isChecked: boolean) => {
-    setOpened(isChecked);
+  const filteredSections = useMemo(() => {
+    return sectionList.filter(section => {
+      const isNotSelected = !selectedSectionsForDay.some(s => s.id === section.id);
+      const withinLimit = assistantSectionConfig.some(config => {
+        const totalLimit = config.section.id === section.id ? config.totalLimit : 0;
+        const selectedCount = assistantSelectedDays.filter(d => d.section.id === section.id).length;
+        return selectedCount < totalLimit;
+      });
+      return isNotSelected && withinLimit;
+    });
+  }, [assistantSectionConfig, assistantSelectedDays, sectionList, selectedSectionsForDay]);
+
+  const isCheckboxInvisible = useMemo(() => {
+    if (selectedDay) return false;
+    return isDayDisabled || filteredSections.length === 0 || assistantSectionConfig.length === 0;
+  }, [assistantSectionConfig, filteredSections, isDayDisabled, selectedDay]);
+
+  const handleCheckboxChange = (isChecked: boolean) => {
+    setMenuOpen(isChecked);
     if (!isChecked) {
       unselectDay(assistantId, dayIndex);
     }
   };
 
-  if (screenMode !== ScreenMode.MonthPicker) return;
+  const handleSectionSelect = (section: IDutySection) => {
+    selectDay(assistantId, section, dayIndex);
+    setMenuOpen(false);
+  };
+
+  if (screenMode !== ScreenMode.MonthPicker || isCheckboxInvisible) return;
 
   return (
     <Center>
-      <Menu shadow="md" opened={opened} onChange={setOpened}>
+      <Menu shadow="md" opened={menuOpen} onChange={setMenuOpen}>
         <CheckboxComponent
-          onCheckboxChangeHandler={onCheckboxChangeHandler}
-          isDisabled={isDisabled}
-          selectedSection={selectedDay?.section}
+          tooltip={selectedDay?.section?.name}
+          isChecked={!!selectedDay}
+          color={selectedDay?.section?.color as string}
+          onChange={handleCheckboxChange}
         />
-        <SectionDropdown sectionList={sectionList} setSection={handleSelect} />
+        <SectionDropdown sections={filteredSections} onSelectSection={handleSectionSelect} />
       </Menu>
     </Center>
   );

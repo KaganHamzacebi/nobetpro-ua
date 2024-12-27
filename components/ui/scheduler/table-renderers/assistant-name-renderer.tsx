@@ -37,7 +37,7 @@ function AssistantNameRenderer({ assistantId }: Readonly<IAssistantNameRenderer>
   return (
     <div className="flex min-w-[200px] flex-row items-center gap-x-2">
       <TextInput size="xs" value={name} onChange={handleNameChange} />
-      <TrashButton callback={handleRemove} />
+      <TrashButton callback={handleRemove} tooltip={`Delete ${name}`} />
     </div>
   );
 }

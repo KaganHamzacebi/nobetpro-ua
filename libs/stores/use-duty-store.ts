@@ -37,6 +37,7 @@ interface DutyActions {
   setScreenMode: (mode: ScreenMode) => void;
   setDuty: (duty: IDuty) => void;
   initDuty: (defaultAssistants: IDefaultAssistant[], defaultSections: IDefaultSection[]) => void;
+  resetDuty: () => void;
   /** assistant actions **/
   addAssistant: () => void;
   removeAssistant: (assistant: IDutyAssistant) => void;
@@ -90,6 +91,7 @@ const useDutyStoreBase = create<DutyState & DutyActions>()(
           const newDuty = NewDuty(defaultAssistants, defaultSections);
           get().setDuty(newDuty);
         }),
+      resetDuty: () => set(() => defaultState),
       setDuty: duty =>
         set(state => {
           state.id = duty.id;

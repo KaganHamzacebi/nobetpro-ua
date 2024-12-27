@@ -14,7 +14,7 @@ function SectionCellRenderer({ assistantId, sectionId }: Readonly<ISectionCellRe
     useShallow(
       state =>
         state.assistantSectionConfig.find(
-          config => config.assistantId === assistantId && config.sectionId === sectionId
+          config => config.assistantId === assistantId && config.section.id === sectionId
         )?.totalLimit ?? 0
     )
   );
