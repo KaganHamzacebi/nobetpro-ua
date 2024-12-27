@@ -9,7 +9,6 @@ import { memo } from 'react';
 import AddButton from '../add-button';
 
 function SchedulerBottomBar() {
-  console.log('scheduler-bottom-bar rendering');
   const addAssistant = useDutyStore.use.addAssistant();
   const addSection = useDutyStore.use.addSection();
   const screenMode = useDutyStore.use.screenMode();

@@ -3,14 +3,17 @@ import { ScreenMode } from '../enums/screen-mode';
 
 const monthCellCssClasses = (
   dayIndex: number,
+  assistantId: IDutyAssistant['id'],
   monthConfig: IDuty['monthConfig'],
-  unwantedDays: IDutyAssistant['unwantedDays'],
+  unwantedDays: IDuty['unwantedDays'],
   screenMode: ScreenMode
 ) => {
   const classes: string[] = [];
 
   const isWeekend = monthConfig.weekendIndexes.includes(dayIndex);
-  const isUnwanted = unwantedDays?.includes(dayIndex) ?? false;
+  const isUnwanted = !!unwantedDays.find(
+    u => u.assistantId === assistantId && u.dayIndex === dayIndex
+  );
   const isUnwantedMode = screenMode === ScreenMode.UnwantedDayPicker;
 
   if (isWeekend && isUnwanted) classes.push('bg-attention-700');

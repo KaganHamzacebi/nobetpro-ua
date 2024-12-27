@@ -1,64 +1,102 @@
 import { ScreenMode } from '@/libs/enums/screen-mode';
-import { IDutyAssistant, IDutySection } from '@/libs/models/duty-model';
+import { IDutySection } from '@/libs/models/duty-model';
 import { useDutyStore } from '@/libs/stores/use-duty-store';
 import { Center, Checkbox, Menu, MenuDropdown, MenuItem } from '@mantine/core';
-import { Dispatch, FC, memo, SetStateAction, useCallback, useMemo, useState } from 'react';
+import { FC, memo, useMemo, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 interface IMonthCellRenderer {
   dayIndex: number;
-  assistant: IDutyAssistant;
+  assistantId: string;
 }
 
 const SectionDropdown: FC<{
   sectionList: IDutySection[];
-  setSection: Dispatch<SetStateAction<IDutySection | undefined>>;
-}> = ({ sectionList, setSection }) => (
-  <MenuDropdown>
-    {sectionList.map(section => (
-      <MenuItem key={section.id} onClick={() => setSection(section)}>
-        {section.name}
-      </MenuItem>
-    ))}
-  </MenuDropdown>
-);
+  setSection: (section: IDutySection) => void;
+}> = ({ sectionList, setSection }) => {
+  return (
+    <MenuDropdown>
+      {sectionList.map(section => (
+        <MenuItem key={section.id} onClick={setSection.bind(this, section)}>
+          {section.name}
+        </MenuItem>
+      ))}
+    </MenuDropdown>
+  );
+};
 
 const CheckboxComponent: FC<{
   selectedSection?: IDutySection;
-  onCheckboxChange: (isChecked: boolean) => void;
-}> = ({ selectedSection, onCheckboxChange }) => (
-  <Menu.Target>
-    <Checkbox
-      checked={!!selectedSection}
-      onChange={e => onCheckboxChange(e.currentTarget.checked)}
-      color={selectedSection?.color ?? 'green'}
-    />
-  </Menu.Target>
-);
+  onCheckboxChangeHandler: (isChecked: boolean) => void;
+  isDisabled: boolean;
+}> = ({ selectedSection, onCheckboxChangeHandler, isDisabled }) => {
+  if (isDisabled) return;
 
-function MonthCellRenderer({ dayIndex, assistant }: Readonly<IMonthCellRenderer>) {
-  const screenMode = useDutyStore.use.screenMode();
-  const sectionList = useDutyStore.use.sectionList();
+  return (
+    <Menu.Target>
+      <Checkbox
+        checked={!!selectedSection}
+        onChange={e => onCheckboxChangeHandler(e.currentTarget.checked)}
+        color={selectedSection?.color ?? 'green'}
+      />
+    </Menu.Target>
+  );
+};
 
+function MonthCellRenderer({ dayIndex, assistantId }: Readonly<IMonthCellRenderer>) {
   const [opened, setOpened] = useState(false);
-  const [selectedSection, setSelectedSection] = useState<IDutySection | undefined>();
+  const screenMode = useDutyStore.use.screenMode();
 
-  const isDisabled = useMemo(() => false, []);
+  const selectedDay = useDutyStore(
+    useShallow(state =>
+      state.selectedDays.find(day => day.dayIndex === dayIndex && day.assistantId === assistantId)
+    )
+  );
 
-  const handleCheckboxChange = useCallback((isChecked: boolean) => {
+  const selectDay = useDutyStore.use.selectDay();
+  const unselectDay = useDutyStore.use.unselectDay();
+  const sectionList = useDutyStore.use.sectionList();
+  const isDisabledDay = useDutyStore(
+    useShallow(state => state.disabledDays[assistantId]?.includes(dayIndex))
+  );
+
+  console.log(isDisabledDay);
+
+  const assistantSectionConfig = useDutyStore(
+    useShallow(state =>
+      state.assistantSectionConfig.filter(config => config.assistantId === assistantId)
+    )
+  );
+
+  const isDisabled = useMemo(() => {
+    return isDisabledDay || assistantSectionConfig.length === 0;
+  }, [assistantSectionConfig.length, isDisabledDay]);
+
+  const handleSelect = (section: IDutySection) => {
+    if (section) {
+      selectDay(assistantId, section, dayIndex);
+      setOpened(false);
+    }
+  };
+
+  const onCheckboxChangeHandler = (isChecked: boolean) => {
     setOpened(isChecked);
-    if (!isChecked) setSelectedSection(undefined);
-  }, []);
+    if (!isChecked) {
+      unselectDay(assistantId, dayIndex);
+    }
+  };
 
-  if (screenMode === ScreenMode.UnwantedDayPicker || isDisabled) return;
+  if (screenMode !== ScreenMode.MonthPicker) return;
 
   return (
     <Center>
       <Menu shadow="md" opened={opened} onChange={setOpened}>
         <CheckboxComponent
-          selectedSection={selectedSection}
-          onCheckboxChange={handleCheckboxChange}
+          onCheckboxChangeHandler={onCheckboxChangeHandler}
+          isDisabled={isDisabled}
+          selectedSection={selectedDay?.section}
         />
-        <SectionDropdown sectionList={sectionList} setSection={setSelectedSection} />
+        <SectionDropdown sectionList={sectionList} setSection={handleSelect} />
       </Menu>
     </Center>
   );

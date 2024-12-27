@@ -10,16 +10,12 @@ export interface IDuty {
   assistantList: IDutyAssistant[];
   assistantSectionConfig: IAssistantSectionConfig[];
   sectionList: IDutySection[];
-  daySectionState: IDaySectionState;
+  selectedDays: ISelectedDay[];
+  disabledDays: IDisabledDays;
+  unwantedDays: IUnwantedDay[];
   monthConfig: IDutyMonthConfig;
   numberOfRestDays: number;
 }
-
-export type IDaySectionState = Record<number, IDaySectionStateConfig[]>;
-type IDaySectionStateConfig = {
-  assistant: IDutyAssistant;
-  section: IDutySection;
-};
 
 export interface IDefaultAssistant {
   id: string;
@@ -37,18 +33,26 @@ export interface IDutyAssistant {
   id: string;
   name: string;
   disabledDays: number[];
-  unwantedDays: number[];
 }
 
-export interface IAssistantSelectedDays {
+export interface ISelectedDay {
   dayIndex: number;
   assistantId: string;
-  sectionId: string;
+  section: IDutySection;
+}
+
+export interface IDisabledDays {
+  [assistantId: string]: number[];
+}
+
+export interface IUnwantedDay {
+  dayIndex: number;
+  assistantId: string;
 }
 
 export interface IAssistantSectionConfig {
   assistantId: string;
-  sectionId: string;
+  section: IDutySection;
   totalLimit: number;
 }
 

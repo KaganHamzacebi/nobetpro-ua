@@ -1,4 +1,5 @@
 import { ScreenMode } from '@/libs/enums/screen-mode';
+import { monthCellCssClasses } from '@/libs/helpers/mantine-table-css.helper';
 import { IDutyAssistant } from '@/libs/models/duty-model';
 import { IMRT_Cell } from '@/libs/models/mrt-model';
 import { useDutyStore } from '@/libs/stores/use-duty-store';
@@ -26,19 +27,29 @@ const MonthCellRenderer = dynamic(
   { ssr: false }
 );
 
+type RowType = IDutyAssistant;
+
 function SchedulerTable() {
   const monthConfig = useDutyStore.use.monthConfig();
   const screenMode = useDutyStore.use.screenMode();
   const sectionList = useDutyStore.use.sectionList();
   const assistantList = useDutyStore.use.assistantList();
+  const unwantedDays = useDutyStore.use.unwantedDays();
+  const toggleUnwantedDay = useDutyStore.use.toggleUnwantedDay();
+
+  const page = 1;
+  const pageSize = 10;
 
   const assistantNameColumn = useMemo<MRT_ColumnDef<IDutyAssistant>>(
     () => ({
       id: 'assistant_name',
       accessorKey: 'name',
       header: 'Assistant',
-      Cell: ({ row }: IMRT_Cell<IDutyAssistant>) => (
-        <AssistantNameRenderer key={`assistant_name-${row.original.id}`} assistant={row.original} />
+      Cell: ({ row }: IMRT_Cell<RowType>) => (
+        <AssistantNameRenderer
+          key={`assistant_name-${row.original.id}`}
+          assistantId={row.original.id}
+        />
       )
     }),
     []
@@ -59,18 +70,25 @@ function SchedulerTable() {
             </div>
           )
         },
-        mantineTableBodyCellProps: {
-          className: `${monthConfig.weekendIndexes.includes(index) ? 'bg-onyx' : undefined}`
-        },
-        Cell: ({ row }: IMRT_Cell<IDutyAssistant>) => (
+        mantineTableBodyCellProps: ({ row }) => ({
+          onClick: () => toggleUnwantedDay(row.original.id, index),
+          className: monthCellCssClasses(
+            index,
+            row.original.id,
+            monthConfig,
+            unwantedDays,
+            screenMode
+          )
+        }),
+        Cell: ({ row }: IMRT_Cell<RowType>) => (
           <MonthCellRenderer
             key={`month_cell-${row.original.id}-${index}`}
             dayIndex={index}
-            assistant={row.original}
+            assistantId={row.original.id}
           />
         )
       })),
-    [monthConfig]
+    [monthConfig, screenMode, toggleUnwantedDay, unwantedDays]
   );
 
   const sectionColumns = useMemo<MRT_ColumnDef<IDutyAssistant>[]>(
@@ -79,7 +97,7 @@ function SchedulerTable() {
         id: 'section-column-' + section.id,
         header: 'Section',
         Header: <SectionHeaderRenderer section={section} />,
-        Cell: ({ row }: IMRT_Cell<IDutyAssistant>) => (
+        Cell: ({ row }: IMRT_Cell<RowType>) => (
           <SectionCellRenderer
             key={`section_cell_${row.original.id}-${section.id}`}
             assistantId={row.original.id}
@@ -114,7 +132,7 @@ function SchedulerTable() {
       showRowsPerPage: false
     },
     initialState: {
-      pagination: { pageSize: 10, pageIndex: 0 },
+      pagination: { pageSize: pageSize, pageIndex: page - 1 },
       columnPinning: { left: ['assistant_name'] },
       density: 'xs'
     },

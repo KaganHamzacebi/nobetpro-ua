@@ -1,7 +1,8 @@
-import { assistantSectionLimitSelector, useDutyStore } from '@/libs/stores/use-duty-store';
+import { useDutyStore } from '@/libs/stores/use-duty-store';
 import { NumberInput } from '@mantine/core';
 import { useDebouncedCallback, useDidUpdate } from '@mantine/hooks';
 import { memo, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 interface ISectionCellRenderer {
   assistantId: string;
@@ -9,9 +10,13 @@ interface ISectionCellRenderer {
 }
 
 function SectionCellRenderer({ assistantId, sectionId }: Readonly<ISectionCellRenderer>) {
-  console.log('section-cell rerender');
   const assistantSectionConfig = useDutyStore(
-    assistantSectionLimitSelector(assistantId, sectionId)
+    useShallow(
+      state =>
+        state.assistantSectionConfig.find(
+          config => config.assistantId === assistantId && config.sectionId === sectionId
+        )?.totalLimit ?? 0
+    )
   );
   const setAssistantSectionLimit = useDutyStore.use.setAssistantSectionLimit();
   const [totalLimit, setTotalLimit] = useState(assistantSectionConfig);

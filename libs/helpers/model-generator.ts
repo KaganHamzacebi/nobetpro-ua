@@ -27,15 +27,17 @@ const NewDuty = (
 
   const assistantSectionConfig = dutyAssistants.flatMap(assistant => {
     return dutySections.map(section =>
-      NewAssistantSectionConfig(assistant.id, section.id, section.defaultValue)
+      NewAssistantSectionConfig(assistant.id, section, section.defaultValue)
     );
   });
 
   return {
     assistantList: dutyAssistants,
     sectionList: dutySections,
+    selectedDays: [],
+    disabledDays: {},
+    unwantedDays: [],
     assistantSectionConfig: assistantSectionConfig,
-    daySectionState: {},
     monthConfig: DefaultMonthConfig,
     numberOfRestDays: 2
   };
@@ -43,10 +45,9 @@ const NewDuty = (
 
 const NewDutyAssistant = (defaults?: Partial<IDutyAssistant>): IDutyAssistant => {
   return {
-    id: GenerateUUID(),
+    id: defaults?.id ?? GenerateUUID(),
     name: defaults?.name ?? 'New Assistant',
-    disabledDays: defaults?.disabledDays ?? [],
-    unwantedDays: defaults?.unwantedDays ?? []
+    disabledDays: defaults?.disabledDays ?? []
   };
 };
 
@@ -61,25 +62,39 @@ const NewDutySection = (defaults?: Partial<IDutySection>): IDutySection => {
 
 const NewAssistantSectionConfig = (
   assistantId: string,
-  sectionId: string,
+  section: IDutySection,
   totalLimit = 0
 ): IAssistantSectionConfig => {
   return {
     assistantId: assistantId,
-    sectionId: sectionId,
+    section: section,
     totalLimit: totalLimit
   };
 };
 
-const NewAssistantSectionConfigList = (assistantId: string, sectionList: IDutySection[]) => {
+const NewAssistantSectionConfigListBySection = (
+  assistantId: string,
+  sectionList: IDutySection[]
+) => {
   return sectionList.map(section =>
-    NewAssistantSectionConfig(assistantId, section.id, section.defaultValue)
+    NewAssistantSectionConfig(assistantId, section, section.defaultValue)
+  );
+};
+
+// prefer me name
+const NewAssistantSectionConfigListByAssistant = (
+  assistantIdList: string[],
+  section: IDutySection
+) => {
+  return assistantIdList.map(assistantId =>
+    NewAssistantSectionConfig(assistantId, section, section.defaultValue)
   );
 };
 
 export {
   NewAssistantSectionConfig,
-  NewAssistantSectionConfigList,
+  NewAssistantSectionConfigListByAssistant,
+  NewAssistantSectionConfigListBySection,
   NewDuty,
   NewDutyAssistant,
   NewDutySection
