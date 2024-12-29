@@ -1,9 +1,17 @@
 'use server';
 
+import { getUser } from '@/libs/supabase/server';
+import { DefaultSection } from '@prisma/client';
+import { unauthorized } from 'next/navigation';
 import prisma from '../prisma';
 
-export const getDefaultSections = async (userId: string) => {
+const getDefaultSections = async (): Promise<DefaultSection[]> => {
+  const user = await getUser();
+  if (!user) unauthorized();
+
   return await prisma.defaultSection.findMany({
-    where: { userId: userId }
+    where: { userId: user.id }
   });
 };
+
+export { getDefaultSections };

@@ -1,23 +1,57 @@
 'use client';
 
 import Scheduler from '@/components/ui/scheduler/scheduler';
+import { getDefaultAssistants } from '@/libs/db/actions/default-assistant-actions';
+import { getDefaultSections } from '@/libs/db/actions/default-section-actions';
+import { TableState } from '@/libs/enums/table-state';
+import { NewDuty } from '@/libs/helpers/model-generator';
 import { useDutyStore } from '@/libs/stores/use-duty-store';
 import { Modal, Text } from '@mantine/core';
 import { useDisclosure, useWindowEvent } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import { IconX } from '@tabler/icons-react';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function SchedulerModal() {
+  const params = useParams();
   const router = useRouter();
   const [opened, handlers] = useDisclosure(true);
+
+  const setDuty = useDutyStore.use.setDuty();
   const resetDuty = useDutyStore.use.resetDuty();
+  const setTableState = useDutyStore.use.setTableState();
+
+  const initNewDuty = async () => {
+    const [assistants, sections] = await Promise.all([
+      getDefaultAssistants(),
+      getDefaultSections()
+    ]);
+
+    const newDuty = NewDuty(assistants, sections);
+    setDuty(newDuty);
+  };
+
+  useEffect(() => {
+    setTableState(TableState.Loading);
+    const setDutyData = async () => {
+      if (params.id === 'new') {
+        await initNewDuty();
+      } else {
+        console.log('fetch-duty');
+      }
+    };
+
+    setDutyData().then(() => {
+      setTableState(TableState.Active);
+    });
+  }, [params.id]);
 
   const windowReloadHandler = () => {
     resetDuty();
   };
 
-  useWindowEvent('beforeunload', windowReloadHandler);
+  useWindowEvent('unload', windowReloadHandler);
 
   const handleOnModalClose = () => {
     const close = () => {

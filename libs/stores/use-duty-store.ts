@@ -6,37 +6,32 @@ import { GenerateUUID } from '@/libs/helpers/id-generator';
 import {
   NewAssistantSectionConfigListByAssistant,
   NewAssistantSectionConfigListBySection,
-  NewDuty,
   NewDutyAssistant,
   NewDutySection
 } from '@/libs/helpers/model-generator';
 import { DefaultMonthConfig } from '@/libs/mock/duty.data';
-import {
-  IDefaultAssistant,
-  IDefaultSection,
-  IDuty,
-  IDutyAssistant,
-  IDutySection
-} from '@/libs/models/duty-model';
+import { IDuty, IDutyAssistant, IDutySection } from '@/libs/models/duty-model';
 import dayjs from 'dayjs';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
+import { TableState } from '../enums/table-state';
 
 type DutyFields = {
   [K in keyof IDuty]: IDuty[K];
 };
 
 interface DutyState extends DutyFields {
+  tableState: 'loading' | 'active';
   screenMode: ScreenMode;
 }
 
 interface DutyActions {
+  setTableState: (state: TableState) => void;
+  setScreenMode: (mode: ScreenMode) => void;
   setRestDays: (restDays: IDuty['numberOfRestDays']) => void;
   setDate: (date: Date) => void;
-  setScreenMode: (mode: ScreenMode) => void;
   setDuty: (duty: IDuty) => void;
-  initDuty: (defaultAssistants: IDefaultAssistant[], defaultSections: IDefaultSection[]) => void;
   resetDuty: () => void;
   /** assistant actions **/
   addAssistant: () => void;
@@ -65,13 +60,18 @@ const defaultState: DutyState = {
   unwantedDays: [],
   monthConfig: DefaultMonthConfig,
   numberOfRestDays: 2,
-  screenMode: ScreenMode.MonthPicker
+  screenMode: ScreenMode.MonthPicker,
+  tableState: TableState.Loading
 };
 
 const useDutyStoreBase = create<DutyState & DutyActions>()(
   devtools(
     immer((set, get) => ({
       ...defaultState,
+      setTableState: tableState =>
+        set(state => {
+          state.tableState = tableState;
+        }),
       setRestDays: restDays =>
         set(state => {
           state.numberOfRestDays = restDays;
@@ -85,11 +85,6 @@ const useDutyStoreBase = create<DutyState & DutyActions>()(
           state.monthConfig.selectedDate = date;
           state.monthConfig.datesInMonth = newDate.daysInMonth();
           state.monthConfig.weekendIndexes = getWeekendDayIndexes(date);
-        }),
-      initDuty: (defaultAssistants, defaultSections) =>
-        set(() => {
-          const newDuty = NewDuty(defaultAssistants, defaultSections);
-          get().setDuty(newDuty);
         }),
       resetDuty: () => set(() => defaultState),
       setDuty: duty =>

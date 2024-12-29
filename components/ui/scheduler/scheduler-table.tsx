@@ -1,5 +1,5 @@
 import { ScreenMode } from '@/libs/enums/screen-mode';
-import { monthCellCssClasses } from '@/libs/helpers/mantine-table-css.helper';
+import { TableState } from '@/libs/enums/table-state';
 import { IDutyAssistant } from '@/libs/models/duty-model';
 import { IMRT_Cell } from '@/libs/models/mrt-model';
 import { useDutyStore } from '@/libs/stores/use-duty-store';
@@ -32,6 +32,7 @@ type RowType = IDutyAssistant;
 function SchedulerTable() {
   const monthConfig = useDutyStore.use.monthConfig();
   const screenMode = useDutyStore.use.screenMode();
+  const tableState = useDutyStore.use.tableState();
   const sectionList = useDutyStore.use.sectionList();
   const assistantList = useDutyStore.use.assistantList();
   const unwantedDays = useDutyStore.use.unwantedDays();
@@ -70,16 +71,6 @@ function SchedulerTable() {
             </div>
           )
         },
-        mantineTableBodyCellProps: ({ row }) => ({
-          onClick: () => toggleUnwantedDay(row.original.id, index),
-          className: monthCellCssClasses(
-            index,
-            row.original.id,
-            monthConfig,
-            unwantedDays,
-            screenMode
-          )
-        }),
         Cell: ({ row }: IMRT_Cell<RowType>) => (
           <MonthCellRenderer
             key={`month_cell-${row.original.id}-${index}`}
@@ -88,7 +79,7 @@ function SchedulerTable() {
           />
         )
       })),
-    [monthConfig, screenMode, toggleUnwantedDay, unwantedDays]
+    [monthConfig]
   );
 
   const sectionColumns = useMemo<MRT_ColumnDef<IDutyAssistant>[]>(
@@ -130,6 +121,10 @@ function SchedulerTable() {
     paginationDisplayMode: 'pages',
     mantinePaginationProps: {
       showRowsPerPage: false
+    },
+    state: {
+      showSkeletons: tableState === TableState.Loading,
+      showLoadingOverlay: tableState === TableState.Loading
     },
     initialState: {
       pagination: { pageSize: pageSize, pageIndex: page - 1 },
