@@ -1,5 +1,6 @@
 import { ScreenMode } from '@/libs/enums/screen-mode';
 import { TableState } from '@/libs/enums/table-state';
+import { monthCellCssClasses } from '@/libs/helpers/mantine-table-css.helper';
 import { IDutyAssistant } from '@/libs/models/duty-model';
 import { IMRT_Cell } from '@/libs/models/mrt-model';
 import { useDutyStore } from '@/libs/stores/use-duty-store';
@@ -71,6 +72,16 @@ function SchedulerTable() {
             </div>
           )
         },
+        mantineTableBodyCellProps: ({ row }) => ({
+          onClick: () => toggleUnwantedDay(row.original.id, index),
+          className: monthCellCssClasses(
+            index,
+            row.original.id,
+            monthConfig,
+            unwantedDays,
+            screenMode
+          )
+        }),
         Cell: ({ row }: IMRT_Cell<RowType>) => (
           <MonthCellRenderer
             key={`month_cell-${row.original.id}-${index}`}
@@ -79,7 +90,7 @@ function SchedulerTable() {
           />
         )
       })),
-    [monthConfig]
+    [monthConfig, screenMode, toggleUnwantedDay, unwantedDays]
   );
 
   const sectionColumns = useMemo<MRT_ColumnDef<IDutyAssistant>[]>(
