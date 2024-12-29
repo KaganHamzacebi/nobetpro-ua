@@ -1,7 +1,6 @@
 'use client';
 
 import Scheduler from '@/components/ui/scheduler/scheduler';
-import { IDuty } from '@/libs/models/duty-model';
 import { useDutyStore } from '@/libs/stores/use-duty-store';
 import { Modal, Text } from '@mantine/core';
 import { useDisclosure, useWindowEvent } from '@mantine/hooks';
@@ -9,11 +8,7 @@ import { modals } from '@mantine/modals';
 import { IconX } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 
-interface ISchedulerModal {
-  duty: IDuty;
-}
-
-export default function SchedulerModal({ duty }: Readonly<ISchedulerModal>) {
+export default function SchedulerModal() {
   const router = useRouter();
   const [opened, handlers] = useDisclosure(true);
   const resetDuty = useDutyStore.use.resetDuty();
@@ -27,7 +22,7 @@ export default function SchedulerModal({ duty }: Readonly<ISchedulerModal>) {
   const handleOnModalClose = () => {
     const close = () => {
       handlers.close();
-      router.back();
+      router.push('/dashboard/duty-list');
       resetDuty();
     };
 
@@ -63,7 +58,7 @@ export default function SchedulerModal({ duty }: Readonly<ISchedulerModal>) {
         }
       }}>
       <Modal.Body>
-        <Scheduler defaultDuty={duty} />
+        <Scheduler />
       </Modal.Body>
     </Modal>
   );

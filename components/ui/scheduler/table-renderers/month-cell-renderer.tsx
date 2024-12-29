@@ -47,8 +47,6 @@ const CheckboxComponent: FC<{
 function MonthCellRenderer({ dayIndex, assistantId }: Readonly<IMonthCellRenderer>) {
   const [menuOpen, setMenuOpen] = useState(false);
 
-  console.log('render');
-
   const screenMode = useDutyStore.use.screenMode();
   const selectDay = useDutyStore.use.selectDay();
   const unselectDay = useDutyStore.use.unselectDay();

@@ -5,6 +5,7 @@ import '@/styles/globals.scss';
 import { ColorSchemeScript } from '@mantine/core';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import Script from 'next/script';
 import { ReactNode } from 'react';
 import Metrics from './metrics';
 
@@ -26,7 +27,10 @@ export default async function RootLayout({ children }: Readonly<IRootLayout>) {
     <html lang="en" suppressHydrationWarning>
       <head>
         {process.env.NODE_ENV === 'development' && (
-          <script src="https://unpkg.com/react-scan/dist/auto.global.js" async />
+          <Script
+            src="https://unpkg.com/react-scan/dist/auto.global.js"
+            strategy="afterInteractive"
+          />
         )}
         <title>Nöbet Pro</title>
         <ColorSchemeScript />
