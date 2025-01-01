@@ -33,8 +33,8 @@ importers:
         specifier: ^5.21.1
         version: 5.21.1(prisma@6.0.0)
       '@supabase/ssr':
-        specifier: ^0.5.1
-        version: 0.5.1(@supabase/supabase-js@2.46.1(bufferutil@4.0.8))
+        specifier: ^0.5.2
+        version: 0.5.2(@supabase/supabase-js@2.46.1(bufferutil@4.0.8))
       '@supabase/supabase-js':
         specifier: ^2.46.1
         version: 2.46.1(bufferutil@4.0.8)
@@ -500,8 +500,8 @@ packages:
   '@supabase/realtime-js@2.10.7':
     resolution: {integrity: sha512-OLI0hiSAqQSqRpGMTUwoIWo51eUivSYlaNBgxsXZE7PSoWh12wPRdVt0psUMaUzEonSB85K21wGc7W5jHnT6uA==}
 
-  '@supabase/ssr@0.5.1':
-    resolution: {integrity: sha512-+G94H/GZG0nErZ3FQV9yJmsC5Rj7dmcfCAwOt37hxeR1La+QTl8cE9whzYwPUrTJjMLGNXoO+1BMvVxwBAbz4g==}
+  '@supabase/ssr@0.5.2':
+    resolution: {integrity: sha512-n3plRhr2Bs8Xun1o4S3k1CDv17iH5QY9YcoEvXX3bxV1/5XSasA0mNXYycFmADIdtdE6BG9MRjP5CGIs8qxC8A==}
     peerDependencies:
       '@supabase/supabase-js': ^2.43.4
 
@@ -559,6 +559,9 @@ packages:
 
   '@types/bcryptjs@2.4.6':
     resolution: {integrity: sha512-9xlo6R2qDs5uixm0bcIqCeMCE6HiQsIyel9KQySStiyqNl2tnj2mP3DX1Nf56MD6KMenNNlBBsy3LJ7gUEQPXQ==}
+
+  '@types/cookie@0.6.0':
+    resolution: {integrity: sha512-4Kh9a6B2bQciAhf7FSuMRRkUWecJgJu9nPnx3yzpsfXX/c50REIqpHY4C82bXP90qrLtXtkDxTZosYO3UpOwlA==}
 
   '@types/estree@1.0.6':
     resolution: {integrity: sha512-AYnb1nQyY49te+VRAVgmzfcgjYS91mY5P0TKUDCLEM+gNnA+3T6rWITXRLYCpahpqSQbN5cE+gHpnPyXjHWxcw==}
@@ -977,8 +980,8 @@ packages:
   concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
 
-  cookie@0.6.0:
-    resolution: {integrity: sha512-U71cyTamuh1CRNCfpGY6to28lxvNwPG4Guz/EVjgf3Jmzv0vlDp1atT9eS5dDjMYHucpHbWns6Lwf3BKz6svdw==}
+  cookie@0.7.2:
+    resolution: {integrity: sha512-yki5XnKuf750l50uGTllt6kKILY4nQ1eNIQatoXEByZ5dWgnKqbnqmTrBE5B4N7lrMJKQ2ytWMiTO2o0v6Ew/w==}
     engines: {node: '>= 0.6'}
 
   cross-spawn@7.0.5:
@@ -3089,10 +3092,11 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@supabase/ssr@0.5.1(@supabase/supabase-js@2.46.1(bufferutil@4.0.8))':
+  '@supabase/ssr@0.5.2(@supabase/supabase-js@2.46.1(bufferutil@4.0.8))':
     dependencies:
       '@supabase/supabase-js': 2.46.1(bufferutil@4.0.8)
-      cookie: 0.6.0
+      '@types/cookie': 0.6.0
+      cookie: 0.7.2
 
   '@supabase/storage-js@2.7.1':
     dependencies:
@@ -3152,6 +3156,8 @@ snapshots:
   '@tanstack/virtual-core@3.8.3': {}
 
   '@types/bcryptjs@2.4.6': {}
+
+  '@types/cookie@0.6.0': {}
 
   '@types/estree@1.0.6': {}
 
@@ -3618,7 +3624,7 @@ snapshots:
 
   concat-map@0.0.1: {}
 
-  cookie@0.6.0: {}
+  cookie@0.7.2: {}
 
   cross-spawn@7.0.5:
     dependencies:
