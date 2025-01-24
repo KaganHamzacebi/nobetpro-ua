@@ -134,7 +134,6 @@ function SchedulerTable() {
       showRowsPerPage: false
     },
     state: {
-      showSkeletons: tableState === TableState.Loading,
       showLoadingOverlay: tableState === TableState.Loading
     },
     initialState: {

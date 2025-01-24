@@ -2,7 +2,10 @@ import { PrismaClient } from '@prisma/client';
 
 const prismaClientSingleton = () => {
   return new PrismaClient({
-    log: ['warn', 'error']
+    log: ['error'],
+    transactionOptions: {
+      timeout: 60 * 5 // 5 minutes
+    }
   });
 };
 

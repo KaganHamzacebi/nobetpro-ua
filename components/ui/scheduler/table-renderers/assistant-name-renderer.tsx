@@ -1,7 +1,6 @@
 import TrashButton from '@/components/ui/trash-button';
 import { useDutyStore } from '@/libs/stores/use-duty-store';
 import { TextInput } from '@mantine/core';
-import { useDebouncedCallback, useDidUpdate } from '@mantine/hooks';
 import { ChangeEvent, memo, useCallback, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
@@ -18,25 +17,26 @@ function AssistantNameRenderer({ assistantId }: Readonly<IAssistantNameRenderer>
   const removeAssistant = useDutyStore.use.removeAssistant();
   const updateAssistant = useDutyStore.use.updateAssistant();
 
-  useDidUpdate(() => {
-    updateAssistantName(name);
-  }, [name]);
-
-  const updateAssistantName = useDebouncedCallback((name: string) => {
-    updateAssistant(assistant.id, { name: name });
-  }, 500);
-
   const handleNameChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);
   }, []);
 
-  const handleRemove = useCallback(() => {
+  const handleUpdateAssistant = useCallback(async () => {
+    updateAssistant(assistant.id, { name: name });
+  }, [assistant.id, name, updateAssistant]);
+
+  const handleRemove = useCallback(async () => {
     removeAssistant(assistant);
   }, [assistant, removeAssistant]);
 
   return (
     <div className="flex min-w-[200px] flex-row items-center gap-x-2">
-      <TextInput size="xs" value={name} onChange={handleNameChange} />
+      <TextInput
+        size="xs"
+        value={name}
+        onChange={handleNameChange}
+        onBlur={handleUpdateAssistant}
+      />
       <TrashButton callback={handleRemove} tooltip={`Delete ${name}`} />
     </div>
   );

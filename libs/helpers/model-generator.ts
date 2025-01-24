@@ -22,7 +22,10 @@ const NewDuty = (
   );
 
   const dutyAssistants: IDutyAssistant[] = defaultAssistants.map(assistant =>
-    NewDutyAssistant(assistant)
+    NewDutyAssistant({
+      ...assistant,
+      id: GenerateUUID()
+    })
   );
 
   const assistantSectionConfig = dutyAssistants.flatMap(assistant => {
@@ -32,22 +35,23 @@ const NewDuty = (
   });
 
   return {
+    id: GenerateUUID(),
+    pinned: false,
     assistantList: dutyAssistants,
     sectionList: dutySections,
     selectedDays: [],
-    disabledDays: {},
     unwantedDays: [],
+    disabledDays: {},
     assistantSectionConfig: assistantSectionConfig,
     monthConfig: DefaultMonthConfig,
-    numberOfRestDays: 2
+    restDayCount: 2
   };
 };
 
 const NewDutyAssistant = (defaults?: Partial<IDutyAssistant>): IDutyAssistant => {
   return {
     id: defaults?.id ?? GenerateUUID(),
-    name: defaults?.name ?? 'New Assistant',
-    disabledDays: defaults?.disabledDays ?? []
+    name: defaults?.name ?? 'New Assistant'
   };
 };
 
@@ -67,13 +71,14 @@ const NewAssistantSectionConfig = (
 ): IAssistantSectionConfig => {
   return {
     assistantId: assistantId,
-    section: section,
-    totalLimit: totalLimit
+    sectionId: section.id,
+    totalLimit: totalLimit,
+    section: section
   };
 };
 
 const NewAssistantSectionConfigListBySection = (
-  assistantId: string,
+  assistantId: IDutyAssistant['id'],
   sectionList: IDutySection[]
 ) => {
   return sectionList.map(section =>
@@ -83,7 +88,7 @@ const NewAssistantSectionConfigListBySection = (
 
 // prefer me name
 const NewAssistantSectionConfigListByAssistant = (
-  assistantIdList: string[],
+  assistantIdList: IDutyAssistant['id'][],
   section: IDutySection
 ) => {
   return assistantIdList.map(assistantId =>

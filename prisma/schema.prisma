@@ -1,0 +1,169 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["omitApi"]
+}
+
+model DefaultAssistant {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  name      String
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model DefaultSection {
+  id           String   @id @default(uuid()) @db.Uuid
+  userId       String   @db.Uuid
+  name         String
+  defaultValue Int      @default(0)
+  color        String?
+  updatedAt    DateTime @updatedAt
+  createdAt    DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Duty {
+  id                     String                   @id @default(uuid()) @db.Uuid
+  userId                 String                   @db.Uuid
+  restDayCount           Int
+  description String?
+  pinned                Boolean @default(false)
+  updatedAt              DateTime                 @updatedAt
+  createdAt              DateTime                 @default(now())
+  assistantSectionConfig AssistantSectionConfig[]
+  user                   User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assistantList          DutyAssistant[]
+  monthConfig            DutyMonthConfig?
+  sectionList            DutySection[]
+  selectedDays           SelectedDay[]
+  unwantedDays           UnwantedDay[]
+}
+
+model DutyMonthConfig {
+  dutyId         String   @unique @db.Uuid
+  selectedDate   DateTime
+  datesInMonth   Int
+  weekendIndexes Int[]
+  duty           Duty     @relation(fields: [dutyId], references: [id], onDelete: Cascade)
+}
+
+model DutyAssistant {
+  id                     String                   @id @db.Uuid
+  dutyId                 String                   @db.Uuid
+  name                   String
+  updatedAt              DateTime                 @updatedAt
+  createdAt              DateTime                 @default(now())
+  assistantSectionConfig AssistantSectionConfig[]
+  unwantedDay            UnwantedDay[]
+  duty                   Duty                     @relation(fields: [dutyId], references: [id], onDelete: Cascade)
+  selectedDay            SelectedDay[]
+}
+
+model DutySection {
+  id                         String                   @id @db.Uuid
+  dutyId                     String                   @db.Uuid
+  name                       String
+  color                      String
+  updatedAt                  DateTime                 @updatedAt
+  createdAt                  DateTime                 @default(now())
+  dutyAssistantSectionConfig AssistantSectionConfig[]
+  duty                       Duty                     @relation(fields: [dutyId], references: [id], onDelete: Cascade)
+  selectedDay                SelectedDay[]
+}
+
+model SelectedDay {
+  dutyId      String        @db.Uuid
+  dayIndex    Int
+  assistantId String        @db.Uuid
+  sectionId   String        @db.Uuid
+  assistant   DutyAssistant @relation(fields: [assistantId], references: [id], onDelete: Cascade)
+  duty        Duty          @relation(fields: [dutyId], references: [id], onDelete: Cascade)
+  section     DutySection   @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  @@id([assistantId, dayIndex])
+}
+
+model UnwantedDay {
+  dutyId      String        @db.Uuid
+  assistantId String        @db.Uuid
+  dayIndex    Int
+  assistant   DutyAssistant @relation(fields: [assistantId], references: [id], onDelete: Cascade)
+  duty        Duty          @relation(fields: [dutyId], references: [id], onDelete: Cascade)
+
+  @@id([assistantId, dayIndex])
+}
+
+model AssistantSectionConfig {
+  dutyId      String        @db.Uuid
+  assistantId String        @db.Uuid
+  sectionId   String        @db.Uuid
+  totalLimit  Int
+  assistant   DutyAssistant @relation(fields: [assistantId], references: [id], onDelete: Cascade)
+  duty        Duty          @relation(fields: [dutyId], references: [id], onDelete: Cascade)
+  section     DutySection   @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  @@id([dutyId, assistantId, sectionId])
+}
+
+model Account {
+  id                String  @id @default(uuid())
+  userId            String  @map("user_id") @db.Uuid
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id") @db.Uuid
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model User {
+  id            String    @id @default(uuid()) @db.Uuid
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime? @map("email_verified")
+  image         String?
+  password      String?
+  accounts      Account[]
+  sessions      Session[]
+
+  defaultAssistant DefaultAssistant[]
+  defaultSection   DefaultSection[]
+  duty             Duty[]
+
+  @@map("users")
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verificationtokens")
+}

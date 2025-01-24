@@ -1,64 +1,114 @@
-export interface IDutyMonthConfig {
-  selectedDate: Date;
-  datesInMonth: number;
-  weekendIndexes: number[];
-}
+import { UuidSchema } from '@/libs/helpers/schemas';
+import { z } from 'zod';
 
-export interface IDuty {
-  id?: string;
-  userId?: string;
-  assistantList: IDutyAssistant[];
-  assistantSectionConfig: IAssistantSectionConfig[];
-  sectionList: IDutySection[];
-  selectedDays: ISelectedDay[];
+export const DefaultAssistantSchema = z.object({
+  id: UuidSchema.optional(),
+  userId: UuidSchema.optional(),
+  name: z.string(),
+  updatedAt: z.coerce.date().optional(),
+  createdAt: z.coerce.date().optional()
+});
+
+export type IDefaultAssistant = z.infer<typeof DefaultAssistantSchema>;
+
+export const DefaultSectionSchema = z.object({
+  id: UuidSchema.optional(),
+  userId: UuidSchema.optional(),
+  name: z.string(),
+  defaultValue: z.number().min(0),
+  color: z.string().nullable(),
+  updatedAt: z.coerce.date().optional(),
+  createdAt: z.coerce.date().optional()
+});
+
+export type IDefaultSection = z.infer<typeof DefaultSectionSchema>;
+
+export const MonthConfigSchema = z.object({
+  selectedDate: z.coerce.date(),
+  datesInMonth: z.number(),
+  weekendIndexes: z.number().array()
+});
+
+export type IMonthConfig = z.infer<typeof MonthConfigSchema>;
+
+export const DutyAssistantSchema = z.object({
+  id: UuidSchema,
+  dutyId: UuidSchema.optional(),
+  name: z.string(),
+  updatedAt: z.coerce.date().optional(),
+  createdAt: z.coerce.date().optional()
+});
+
+export type IDutyAssistant = z.infer<typeof DutyAssistantSchema>;
+
+export const DutySectionSchema = z.object({
+  id: UuidSchema,
+  dutyId: UuidSchema.optional(),
+  name: z.string(),
+  color: z.string(),
+  defaultValue: z.number().min(0).optional(),
+  updatedAt: z.coerce.date().optional(),
+  createdAt: z.coerce.date().optional()
+});
+
+export type IDutySection = z.infer<typeof DutySectionSchema>;
+
+export const SelectedDaySchema = z.object({
+  dutyId: UuidSchema.optional(),
+  dayIndex: z.number(),
+  assistantId: UuidSchema,
+  sectionId: UuidSchema,
+  section: DutySectionSchema.optional()
+});
+
+export const SelectedDayCreateSchema = SelectedDaySchema.pick({
+  dayIndex: true,
+  assistantId: true,
+  sectionId: true
+});
+
+export type SelectedDayCreate = z.infer<typeof SelectedDayCreateSchema>;
+
+export type ISelectedDay = z.infer<typeof SelectedDaySchema>;
+
+export const UnwantedDaySchema = z.object({
+  dutyId: UuidSchema.optional(),
+  dayIndex: z.number().min(0),
+  assistantId: z.string()
+});
+
+export type IUnwantedDay = z.infer<typeof UnwantedDaySchema>;
+
+export const AssistantSectionConfigSchema = z.object({
+  dutyId: UuidSchema.optional(),
+  assistantId: UuidSchema,
+  sectionId: UuidSchema,
+  totalLimit: z.number(),
+  section: DutySectionSchema.optional(),
+  assistant: DutyAssistantSchema.optional()
+});
+
+export type IAssistantSectionConfig = z.infer<typeof AssistantSectionConfigSchema>;
+
+export const DisabledDaysSchema = z.record(z.number().array());
+
+export type IDisabledDays = z.infer<typeof DisabledDaysSchema>;
+
+export const DutySchema = z.object({
+  id: UuidSchema,
+  userId: UuidSchema.optional(),
+  restDayCount: z.number().min(0),
+  pinned: z.boolean().default(false),
+  monthConfig: MonthConfigSchema.required(),
+  assistantList: DutyAssistantSchema.array(),
+  assistantSectionConfig: AssistantSectionConfigSchema.array(),
+  sectionList: DutySectionSchema.array(),
+  selectedDays: SelectedDaySchema.array(),
+  unwantedDays: UnwantedDaySchema.array(),
+  updatedAt: z.coerce.date().optional(),
+  createdAt: z.coerce.date().optional()
+});
+
+export interface IDuty extends z.infer<typeof DutySchema> {
   disabledDays: IDisabledDays;
-  unwantedDays: IUnwantedDay[];
-  monthConfig: IDutyMonthConfig;
-  numberOfRestDays: number;
-}
-
-export interface IDefaultAssistant {
-  id: string;
-  name: string;
-}
-
-export interface IDefaultSection {
-  id: string;
-  name: string;
-  color: string | null;
-  defaultValue?: number;
-}
-
-export interface IDutyAssistant {
-  id: string;
-  name: string;
-  disabledDays: number[];
-}
-
-export interface ISelectedDay {
-  dayIndex: number;
-  assistantId: string;
-  section: IDutySection;
-}
-
-export interface IDisabledDays {
-  [assistantId: string]: number[];
-}
-
-export interface IUnwantedDay {
-  dayIndex: number;
-  assistantId: string;
-}
-
-export interface IAssistantSectionConfig {
-  assistantId: string;
-  section: IDutySection;
-  totalLimit: number;
-}
-
-export interface IDutySection {
-  id: string;
-  name: string;
-  defaultValue: number;
-  color: string | null;
 }

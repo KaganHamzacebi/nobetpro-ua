@@ -2,7 +2,6 @@
 
 import { AppShell, Burger, Group } from '@mantine/core';
 import Logo from '../logo';
-import UserAvatar from '../user-avatar';
 import HeaderNavItem, { INavLink } from './header-nav-item';
 
 const navLinks: INavLink[] = [
@@ -29,7 +28,6 @@ export default function Header() {
             <HeaderNavItem key={navLink.href} name={navLink.name} href={navLink.href} />
           ))}
         </Group>
-        <UserAvatar />
       </Group>
     </AppShell.Header>
   );

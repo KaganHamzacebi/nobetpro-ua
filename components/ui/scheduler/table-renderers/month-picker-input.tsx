@@ -8,7 +8,7 @@ const TODAY = dayjs().toDate();
 
 function DSMonthPickerInput() {
   const setDate = useDutyStore.use.setDate();
-  const isAnySelected = useDutyStore.use.selectedDays().length > 0;
+  const isAnySelected = useDutyStore(state => state.selectedDays.length > 0);
 
   const onDateChange = (date: Date | null) => {
     if (date == null) throw new Error('Date cannot be null');

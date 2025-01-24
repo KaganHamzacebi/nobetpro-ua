@@ -3,7 +3,7 @@ import { NumberInput } from '@mantine/core';
 import { memo } from 'react';
 
 function RestDayInput() {
-  const numberOfRestDays = useDutyStore.use.numberOfRestDays();
+  const numberOfRestDays = useDutyStore.use.restDayCount();
   const setRestDays = useDutyStore.use.setRestDays();
   const isAnySelected = useDutyStore.use.selectedDays().length > 0;
 

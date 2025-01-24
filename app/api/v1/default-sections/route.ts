@@ -1,11 +1,13 @@
+import { auth } from '@/libs/auth/auth';
 import prisma from '@/libs/db/prisma';
-import { getUser } from '@/libs/supabase/server';
 import { Prisma } from '@prisma/client';
+import { unauthorized } from 'next/navigation';
 
 // Get All Default Sections
 export async function GET() {
-  const user = await getUser();
-  const userId = user?.id;
+  const session = await auth();
+  if (!session) unauthorized();
+  const userId = session.user?.id;
 
   if (!userId) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
@@ -24,14 +26,14 @@ export async function GET() {
 
 // Create New Default Section
 export async function POST(request: Request) {
-  const user = await getUser();
-  const userId = user?.id;
+  const session = await auth();
+  if (!session) unauthorized();
+  const userId = session.user?.id;
 
-  // body should contain atleast name, color
-  const body: Omit<Prisma.DefaultSectionCreateInput, 'User'> = await request.json();
+  const body: Omit<Prisma.DefaultSectionCreateInput, 'user'> = await request.json();
   const createData: Prisma.DefaultSectionCreateInput = {
     ...body,
-    User: {
+    user: {
       connect: {
         id: userId
       }
@@ -46,8 +48,9 @@ export async function POST(request: Request) {
 
 // Update Default Section
 export async function PUT(request: Request) {
-  const user = await getUser();
-  const userId = user?.id;
+  const session = await auth();
+  if (!session) unauthorized();
+  const userId = session.user?.id;
 
   type UpdateInput = Prisma.DefaultSectionUpdateInput & { id: string };
   const body: UpdateInput = await request.json();

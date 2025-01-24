@@ -1,6 +1,6 @@
 import Providers from '@/app/providers';
 import Shell from '@/components/ui/shell';
-import { getUser } from '@/libs/supabase/server';
+import { auth } from '@/libs/auth/auth';
 import '@/styles/globals.scss';
 import { ColorSchemeScript } from '@mantine/core';
 import type { Metadata } from 'next';
@@ -21,7 +21,7 @@ interface IRootLayout {
 }
 
 export default async function RootLayout({ children }: Readonly<IRootLayout>) {
-  const user = await getUser();
+  const session = await auth();
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -41,7 +41,7 @@ export default async function RootLayout({ children }: Readonly<IRootLayout>) {
       </head>
       <body className={`${inter.className} min-h-screen`}>
         <Metrics />
-        <Providers user={user}>
+        <Providers session={session}>
           <Shell>{children}</Shell>
         </Providers>
       </body>

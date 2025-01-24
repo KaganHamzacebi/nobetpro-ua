@@ -70,7 +70,7 @@ export default function DefaultSectionGrid() {
       if (isCreating) return;
 
       const updatedDefaultSection = {
-        id: row.original.id,
+        id: row.original.id as string,
         [field]: value
       };
       updateDefaultSection(updatedDefaultSection);
@@ -199,7 +199,7 @@ export default function DefaultSectionGrid() {
       <Group content="center">
         <UnstyledButton
           color="red"
-          onClick={() => askForDeletion(() => deleteSection(row.original.id, table))}>
+          onClick={() => askForDeletion(() => deleteSection(row.original.id as string, table))}>
           <IconTrash size={20} color="red" />
         </UnstyledButton>
       </Group>

@@ -1,77 +1,40 @@
 'use client';
 
 import Scheduler from '@/components/ui/scheduler/scheduler';
-import { getDefaultAssistants } from '@/libs/db/actions/default-assistant-actions';
-import { getDefaultSections } from '@/libs/db/actions/default-section-actions';
+import { ScreenMode } from '@/libs/enums/screen-mode';
 import { TableState } from '@/libs/enums/table-state';
-import { NewDuty } from '@/libs/helpers/model-generator';
+import { IDuty } from '@/libs/models/duty-model';
 import { useDutyStore } from '@/libs/stores/use-duty-store';
-import { Modal, Text } from '@mantine/core';
-import { useDisclosure, useWindowEvent } from '@mantine/hooks';
-import { modals } from '@mantine/modals';
+import { Modal } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { IconX } from '@tabler/icons-react';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
-export default function SchedulerModal() {
-  const params = useParams();
+interface ISchedulerModal {
+  duty: IDuty;
+}
+
+export default function SchedulerModal({ duty }: Readonly<ISchedulerModal>) {
   const router = useRouter();
   const [opened, handlers] = useDisclosure(true);
-
   const setDuty = useDutyStore.use.setDuty();
-  const resetDuty = useDutyStore.use.resetDuty();
+  const setScreenMode = useDutyStore.use.setScreenMode();
   const setTableState = useDutyStore.use.setTableState();
 
-  const initNewDuty = async () => {
-    const [assistants, sections] = await Promise.all([
-      getDefaultAssistants(),
-      getDefaultSections()
-    ]);
-
-    const newDuty = NewDuty(assistants, sections);
-    setDuty(newDuty);
-  };
-
   useEffect(() => {
+    console.log('here');
     setTableState(TableState.Loading);
-    const setDutyData = async () => {
-      if (params.id === 'new') {
-        await initNewDuty();
-      } else {
-        console.log('fetch-duty');
-      }
-    };
-
-    setDutyData().then(() => {
-      setTableState(TableState.Active);
-    });
-  }, [params.id]);
-
-  const windowReloadHandler = () => {
-    resetDuty();
-  };
-
-  useWindowEvent('unload', windowReloadHandler);
+    if (duty) {
+      setScreenMode(ScreenMode.MonthPicker);
+      setDuty(duty);
+    }
+    setTableState(TableState.Active);
+  }, []);
 
   const handleOnModalClose = () => {
-    const close = () => {
-      handlers.close();
-      router.push('/dashboard/duty-list');
-      resetDuty();
-    };
-
-    modals.openConfirmModal({
-      title: 'Close Without Saving?',
-      centered: true,
-      labels: { confirm: 'Yes', cancel: 'Cancel' },
-      confirmProps: { color: 'red' },
-      children: (
-        <Text size="sm">
-          You have unsaved changes. Closing this modal will discard them. Do you want to proceed?
-        </Text>
-      ),
-      onConfirm: close
-    });
+    handlers.close();
+    router.push('/dashboard/duty-list');
   };
 
   return (

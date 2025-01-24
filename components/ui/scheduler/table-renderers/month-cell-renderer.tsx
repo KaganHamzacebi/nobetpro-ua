@@ -78,10 +78,12 @@ function MonthCellRenderer({ dayIndex, assistantId }: Readonly<IMonthCellRendere
 
   const filteredSections = useMemo(() => {
     return sectionList.filter(section => {
-      const isNotSelected = !selectedSectionsForDay.some(s => s.id === section.id);
+      const isNotSelected = !selectedSectionsForDay.some(s => s?.id === section.id);
       const withinLimit = assistantSectionConfig.some(config => {
-        const totalLimit = config.section.id === section.id ? config.totalLimit : 0;
-        const selectedCount = assistantSelectedDays.filter(d => d.section.id === section.id).length;
+        const totalLimit = config.section?.id === section.id ? config.totalLimit : 0;
+        const selectedCount = assistantSelectedDays.filter(
+          d => d.section?.id === section.id
+        ).length;
         return selectedCount < totalLimit;
       });
       return isNotSelected && withinLimit;

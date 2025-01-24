@@ -1,7 +1,7 @@
 'use client';
 
+import { googleLogin } from '@/libs/auth/login-actions';
 import { LoginType } from '@/libs/enums/LoginType';
-import { emailLogin, emailSignup, googleLogin, resetPassword } from '@/libs/supabase/login-actions';
 import {
   Anchor,
   Button,
@@ -16,7 +16,7 @@ import { useForm } from '@mantine/form';
 import { IconAt, IconBrandGoogleFilled, IconLock } from '@tabler/icons-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 export default function Login() {
   const searchParams = useSearchParams();
@@ -52,7 +52,9 @@ export default function Login() {
       icon: <IconBrandGoogleFilled />,
       action: () => {
         setLoadingState(LoginType.Google, true);
-        googleLogin();
+        googleLogin().then(() => {
+          setLoadingState(LoginType.Google, false);
+        });
       }
     }
   ];
@@ -73,23 +75,8 @@ export default function Login() {
     }
   });
 
-  const handleFormAction = useCallback(
-    async (values: typeof form.values) => {
-      setLoadingState(LoginType.Email, true);
-      if (isSignup) {
-        await emailSignup(values);
-      } else if (isForgotPassword) {
-        await resetPassword(values.email);
-      } else {
-        await emailLogin(values);
-      }
-      setLoadingState(LoginType.Email, false);
-    },
-    [form, isForgotPassword, isSignup]
-  );
-
   return (
-    <form className="w-full max-w-[400px]" onSubmit={form.onSubmit(handleFormAction)}>
+    <form className="w-full max-w-[400px]" onSubmit={undefined}>
       <Stack className="rounded border border-silver border-opacity-50 p-4">
         <Text fw={600} size="lg">
           Login

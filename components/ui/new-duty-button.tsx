@@ -1,21 +1,23 @@
 'use client';
 
-import { ScreenMode } from '@/libs/enums/screen-mode';
+import { createNewDuty } from '@/libs/db/actions/duty-actions';
+import { showSuccessNotification } from '@/libs/helpers/notification-service';
 import { Button } from '@mantine/core';
 import { useRouter } from 'next/navigation';
-import { useEffect, useTransition } from 'react';
+import { useTransition } from 'react';
 
 export default function NewDutyButton() {
   const router = useRouter();
   const [loading, setTransition] = useTransition();
 
-  useEffect(() => {
-    router.prefetch(`/dashboard/duty-list/new`);
-  }, []);
-
   const handleNewDuty = () => {
     setTransition(async () => {
-      router.push(`/dashboard/duty-list/new?mode=${ScreenMode.MonthPicker}`);
+      const createdDuty = await createNewDuty();
+      router.push(`/dashboard/duty-list/${createdDuty.id}`);
+      showSuccessNotification({
+        title: 'Duty Created',
+        message: 'New duty has been created successfully'
+      });
     });
   };
 
