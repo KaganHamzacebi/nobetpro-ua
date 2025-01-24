@@ -72,7 +72,6 @@ export default function DutyCard({ duty }: DutyCardProps) {
 
   return (
     <Card
-      mx="auto"
       shadow="sm"
       padding="lg"
       radius="md"

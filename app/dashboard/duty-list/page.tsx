@@ -10,7 +10,7 @@ export default async function DutyList() {
 
   return (
     <>
-      <header>
+      <header className="relative">
         <Text fw={700} size="xl">
           Duties
         </Text>
@@ -19,8 +19,8 @@ export default async function DutyList() {
         </Text>
         <Divider mt={4} />
       </header>
-      <main className="max-h-full py-4">
-        <Flex className="max-h-full" wrap="wrap" gap="lg" align="center" justify="start">
+      <main>
+        <Flex className="max-h-full py-4" wrap="wrap" gap="sm" justify="flex-start">
           {duties
             .sort((a, b) => {
               if (a.pinned && !b.pinned) return -1;
@@ -29,7 +29,6 @@ export default async function DutyList() {
               const aUpdatedAt = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
               const bUpdatedAt = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
 
-              // Sort by `updatedAt` (most recently updated first)
               return bUpdatedAt - aUpdatedAt;
             })
             .map(duty => (
@@ -37,7 +36,10 @@ export default async function DutyList() {
             ))}
         </Flex>
       </main>
-      <NewDutyButton />
+
+      <div className="fixed bottom-4 right-4">
+        <NewDutyButton />
+      </div>
     </>
   );
 }

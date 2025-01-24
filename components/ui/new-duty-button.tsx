@@ -22,12 +22,7 @@ export default function NewDutyButton() {
   };
 
   return (
-    <Button
-      className="fixed bottom-4 right-4"
-      size="lg"
-      loading={loading}
-      variant="default"
-      onClick={handleNewDuty}>
+    <Button size="lg" loading={loading} variant="default" onClick={handleNewDuty}>
       New Duty
     </Button>
   );
