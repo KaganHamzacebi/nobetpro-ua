@@ -20,7 +20,7 @@ export default async function DutyList() {
         <Divider mt={4} />
       </header>
       <main>
-        <Flex className="max-h-full py-4" wrap="wrap" gap="sm" justify="flex-start">
+        <Flex py={16} gap="sm" wrap="wrap" justify="flex-start">
           {duties
             .sort((a, b) => {
               if (a.pinned && !b.pinned) return -1;
