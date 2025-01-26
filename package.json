@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "scan": "next dev & npx react-scan@latest http://localhost:3000",
-    "prebuild": "prisma migrate deploy",
+    "prebuild": "prisma migrate deploy && prisma generate",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
