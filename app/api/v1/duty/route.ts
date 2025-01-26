@@ -23,9 +23,9 @@ export async function POST(request: NextRequest) {
           }
         },
         restDayCount: data.restDayCount,
-        monthConfig: {
-          create: data.monthConfig
-        },
+        dutyMonth: data.dutyMonth,
+        pinned: data.pinned,
+        description: data?.description,
         assistantList: {
           create: data.assistantList
         },
@@ -49,7 +49,6 @@ export async function POST(request: NextRequest) {
           }
         },
         assistantList: true,
-        monthConfig: true,
         sectionList: true,
         selectedDays: {
           include: {
@@ -83,7 +82,6 @@ export async function GET() {
         }
       },
       assistantList: true,
-      monthConfig: true,
       sectionList: true,
       selectedDays: {
         include: {

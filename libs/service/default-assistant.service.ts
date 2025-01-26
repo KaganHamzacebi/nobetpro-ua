@@ -13,7 +13,7 @@ export const getDefaultAssistants = async () => {
 };
 
 export const createDefaultAssistant = async (
-  defaultAssistant: Omit<Prisma.DefaultAssistantCreateInput, 'User'>
+  defaultAssistant: Omit<Prisma.DefaultAssistantCreateInput, 'user'>
 ) => {
   const response = await fetch(BASE_API_URL + `/default-assistants`, {
     method: 'POST',

@@ -24,7 +24,6 @@ export const DefaultSectionSchema = z.object({
 export type IDefaultSection = z.infer<typeof DefaultSectionSchema>;
 
 export const MonthConfigSchema = z.object({
-  selectedDate: z.coerce.date(),
   datesInMonth: z.number(),
   weekendIndexes: z.number().array()
 });
@@ -98,8 +97,9 @@ export const DutySchema = z.object({
   id: UuidSchema,
   userId: UuidSchema.optional(),
   restDayCount: z.number().min(0),
+  description: z.string().optional(),
   pinned: z.boolean().default(false),
-  monthConfig: MonthConfigSchema.required(),
+  dutyMonth: z.coerce.date(),
   assistantList: DutyAssistantSchema.array(),
   assistantSectionConfig: AssistantSectionConfigSchema.array(),
   sectionList: DutySectionSchema.array(),
@@ -111,4 +111,5 @@ export const DutySchema = z.object({
 
 export interface IDuty extends z.infer<typeof DutySchema> {
   disabledDays: IDisabledDays;
+  monthConfig: IMonthConfig;
 }

@@ -7,6 +7,7 @@ import { memo } from 'react';
 const TODAY = dayjs().toDate();
 
 function DSMonthPickerInput() {
+  const selectedDate = useDutyStore(state => state.dutyMonth);
   const setDate = useDutyStore.use.setDate();
   const isAnySelected = useDutyStore(state => state.selectedDays.length > 0);
 
@@ -22,7 +23,7 @@ function DSMonthPickerInput() {
       maxLevel="year"
       allowDeselect={false}
       onChange={onDateChange}
-      defaultValue={TODAY}
+      defaultValue={dayjs(selectedDate).toDate()}
       label="Pick Month"
       leftSection={<IconCalendar />}
       leftSectionPointerEvents="none"

@@ -1,19 +1,16 @@
 import { getRandomColor } from '@/libs/helpers/color-generator';
+import { getWeekendDayIndexes } from '@/libs/helpers/get-weekend-indexes';
 import { GenerateUUID } from '@/libs/helpers/id-generator';
-import { DefaultMonthConfig } from '@/libs/mock/duty.data';
 import {
   IAssistantSectionConfig,
   IDefaultAssistant,
   IDefaultSection,
-  IDuty,
   IDutyAssistant,
   IDutySection
 } from '@/libs/models/duty-model';
+import dayjs from 'dayjs';
 
-const NewDuty = (
-  defaultAssistants: IDefaultAssistant[],
-  defaultSections: IDefaultSection[]
-): IDuty => {
+const NewDuty = (defaultAssistants: IDefaultAssistant[], defaultSections: IDefaultSection[]) => {
   const dutySections: IDutySection[] = defaultSections.map(section =>
     NewDutySection({
       ...(section as IDutySection),
@@ -34,16 +31,22 @@ const NewDuty = (
     );
   });
 
+  const now = dayjs();
+
   return {
     id: GenerateUUID(),
     pinned: false,
+    dutyMonth: now.startOf('month').toDate(),
+    monthConfig: {
+      datesInMonth: now.daysInMonth(),
+      weekendIndexes: getWeekendDayIndexes(now.toDate())
+    },
     assistantList: dutyAssistants,
     sectionList: dutySections,
     selectedDays: [],
     unwantedDays: [],
     disabledDays: {},
     assistantSectionConfig: assistantSectionConfig,
-    monthConfig: DefaultMonthConfig,
     restDayCount: 2
   };
 };

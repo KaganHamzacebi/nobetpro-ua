@@ -1,11 +1,9 @@
-import { auth } from '@/libs/auth/auth';
 import { dutyProtectedFields } from '@/libs/consts/protected-fields';
 import prisma from '@/libs/db/prisma';
-import { removeProtectedFields } from '@/libs/helpers/protected-field.helper';
-import { BadRequest } from '@/libs/helpers/response.helper';
+import { getDataOrThrow, getSessionOrThrow } from '@/libs/helpers/auth.helper';
+import { clearUndefinedFieldsInPlace, removeFields } from '@/libs/helpers/protected-field.helper';
 import { UuidSchema } from '@/libs/helpers/schemas';
-import { DutySchema } from '@/libs/models/duty-model';
-import { unauthorized } from 'next/navigation';
+import { DutySchema, IDuty } from '@/libs/models/duty-model';
 import { NextRequest } from 'next/server';
 
 // Get Duty by ID
@@ -13,25 +11,15 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ dutyId: string }> }
 ) {
-  const session = await auth();
-  if (!session) unauthorized();
-  const userId = session.user?.id as string;
-
-  const id = (await params).dutyId;
-  const isValid = UuidSchema.safeParse(id);
-  if (!isValid.success) {
-    return Response.json({
-      status: 403,
-      message: isValid.error.errors.map(error => error.message).join(', ')
-    });
-  }
+  const { userId } = await getSessionOrThrow();
+  const { data: dutyId } = getDataOrThrow((await params).dutyId, UuidSchema);
 
   const response = await prisma.duty.findUnique({
     where: {
       user: {
         id: userId
       },
-      id: id
+      id: dutyId
     },
     include: {
       assistantSectionConfig: {
@@ -40,7 +28,6 @@ export async function GET(
         }
       },
       assistantList: true,
-      monthConfig: true,
       sectionList: true,
       selectedDays: {
         include: {
@@ -54,7 +41,7 @@ export async function GET(
   if (response == null) {
     return Response.json({
       status: 404,
-      message: `Duty with ID: ${id} not found`
+      message: `Duty with ID: ${dutyId} not found`
     });
   }
 
@@ -66,19 +53,13 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ dutyId: string }> }
 ) {
-  const session = await auth();
-  if (!session) unauthorized();
-  const userId = session.user?.id as string;
+  const { userId } = await getSessionOrThrow();
+  const { data: dutyId } = getDataOrThrow((await params).dutyId, UuidSchema);
+  const { data } = getDataOrThrow(await request.json(), DutySchema.partial());
 
-  const id = (await params).dutyId;
-  const { success: idSuccess, data: dutyId, error: idError } = UuidSchema.safeParse(id);
-  if (!idSuccess) return BadRequest(idError);
-
-  const body = await request.json();
-  const { success, data, error } = DutySchema.partial().safeParse(body);
-  if (!success) return BadRequest(error);
-
-  removeProtectedFields(data, dutyProtectedFields);
+  removeFields(data, dutyProtectedFields);
+  clearUndefinedFieldsInPlace(data);
+  const protectedData = data as Omit<IDuty, (typeof dutyProtectedFields)[number]>;
 
   const response = await prisma.duty.update({
     where: {
@@ -87,9 +68,7 @@ export async function PATCH(
       },
       id: dutyId
     },
-    data: {
-      ...data
-    }
+    data: protectedData
   });
 
   return Response.json(response);
@@ -100,22 +79,15 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ dutyId: string }> }
 ) {
-  const session = await auth();
-  if (!session) unauthorized();
-  const userId = session.user?.id as string;
-
-  const id = (await params).dutyId;
-  const isValid = UuidSchema.safeParse(id);
-  if (!isValid.success) {
-    return BadRequest(isValid.error);
-  }
+  const { userId } = await getSessionOrThrow();
+  const { data: dutyId } = getDataOrThrow((await params).dutyId, UuidSchema);
 
   const response = await prisma.duty.delete({
     where: {
       user: {
         id: userId
       },
-      id: id
+      id: dutyId
     }
   });
 

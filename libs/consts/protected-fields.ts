@@ -5,7 +5,7 @@ import {
   IDutySection
 } from '@/libs/models/duty-model';
 
-export const dutyProtectedFields: ReadonlyArray<keyof IDuty> = [
+export const dutyProtectedFields: Array<keyof IDuty> = [
   'id',
   'userId',
   'monthConfig',
@@ -13,27 +13,27 @@ export const dutyProtectedFields: ReadonlyArray<keyof IDuty> = [
   'assistantList',
   'assistantSectionConfig',
   'selectedDays',
-  'unwantedDays',
   'disabledDays',
+  'unwantedDays',
   'createdAt',
   'updatedAt'
 ];
 
-export const dutyAssistantProtectedFields: ReadonlyArray<keyof IDutyAssistant> = [
+export const dutyAssistantProtectedFields: Array<keyof IDutyAssistant> = [
   'id',
   'dutyId',
   'createdAt',
   'updatedAt'
 ];
 
-export const dutySectionProtectedFields: ReadonlyArray<keyof IDutySection> = [
+export const dutySectionProtectedFields: Array<keyof IDutySection> = [
   'id',
   'dutyId',
   'createdAt',
   'updatedAt'
 ];
 
-export const assistantSectionConfigProtectedFields: ReadonlyArray<keyof IAssistantSectionConfig> = [
+export const assistantSectionConfigProtectedFields: Array<keyof IAssistantSectionConfig> = [
   'dutyId',
   'assistantId',
   'sectionId',

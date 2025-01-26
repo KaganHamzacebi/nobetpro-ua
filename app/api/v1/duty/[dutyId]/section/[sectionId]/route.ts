@@ -1,7 +1,7 @@
 import { dutySectionProtectedFields } from '@/libs/consts/protected-fields';
 import prisma from '@/libs/db/prisma';
 import { getDataOrThrow, getSessionOrThrow } from '@/libs/helpers/auth.helper';
-import { removeProtectedFields } from '@/libs/helpers/protected-field.helper';
+import { removeFields } from '@/libs/helpers/protected-field.helper';
 import { BadRequest, Created, Success } from '@/libs/helpers/response.helper';
 import { UuidSchema } from '@/libs/helpers/schemas';
 import { DutySectionSchema } from '@/libs/models/duty-model';
@@ -22,7 +22,7 @@ export async function PATCH(
   const { success, data, error } = DutySectionSchema.partial().safeParse(body);
   if (!success) return BadRequest(error);
 
-  removeProtectedFields(data, dutySectionProtectedFields);
+  removeFields(data, dutySectionProtectedFields);
 
   const response = await prisma.dutySection.update({
     where: {

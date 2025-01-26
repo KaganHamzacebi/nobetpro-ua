@@ -1,7 +1,7 @@
 import { dutyAssistantProtectedFields } from '@/libs/consts/protected-fields';
 import prisma from '@/libs/db/prisma';
 import { getDataOrThrow, getSessionOrThrow } from '@/libs/helpers/auth.helper';
-import { removeProtectedFields } from '@/libs/helpers/protected-field.helper';
+import { removeFields } from '@/libs/helpers/protected-field.helper';
 import { Created, Success } from '@/libs/helpers/response.helper';
 import { UuidSchema } from '@/libs/helpers/schemas';
 import { DutyAssistantSchema } from '@/libs/models/duty-model';
@@ -17,7 +17,7 @@ export async function PATCH(
   const { data: assistantId } = getDataOrThrow((await params).assistantId, UuidSchema);
   const { data } = getDataOrThrow(await request.json(), DutyAssistantSchema.partial());
 
-  removeProtectedFields(data, dutyAssistantProtectedFields);
+  removeFields(data, dutyAssistantProtectedFields);
 
   const response = await prisma.dutyAssistant.update({
     where: {

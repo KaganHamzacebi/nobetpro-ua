@@ -12,6 +12,7 @@ import {
   unselectUnwantedDay,
   updateAssistant,
   updateAssistantSectionConfigLimit,
+  updateDuty,
   updateSection
 } from '@/libs/db/actions/duty-actions';
 import { ScreenMode } from '@/libs/enums/screen-mode';
@@ -25,7 +26,6 @@ import {
   NewDutyAssistant,
   NewDutySection
 } from '@/libs/helpers/model-generator';
-import { DefaultMonthConfig } from '@/libs/mock/duty.data';
 import { IDisabledDays, IDuty, IDutyAssistant, IDutySection } from '@/libs/models/duty-model';
 import dayjs from 'dayjs';
 import { create } from 'zustand';
@@ -70,13 +70,17 @@ const defaultState: DutyState = {
   id: '',
   userId: undefined,
   pinned: false,
+  dutyMonth: new Date(),
   assistantList: [],
   assistantSectionConfig: [],
   sectionList: [],
   disabledDays: {},
   selectedDays: [],
   unwantedDays: [],
-  monthConfig: DefaultMonthConfig,
+  monthConfig: {
+    datesInMonth: 30,
+    weekendIndexes: []
+  },
   restDayCount: 2,
   screenMode: ScreenMode.MonthPicker,
   tableState: TableState.Loading
@@ -96,16 +100,20 @@ const useDutyStoreBase = create<DutyState & DutyActions>()(
           state.restDayCount = restDays;
         });
       },
-      setDate: date => {
-        set(state => {
-          const oldDate = dayjs(state.monthConfig.selectedDate);
-          const newDate = dayjs(date);
-          if (newDate.isSame(oldDate, 'month')) return state;
+      setDate: async date => {
+        const oldDate = dayjs(get().dutyMonth);
+        const newDate = dayjs(date);
 
-          state.monthConfig.selectedDate = date;
-          state.monthConfig.datesInMonth = newDate.daysInMonth();
-          state.monthConfig.weekendIndexes = getWeekendDayIndexes(date);
-        });
+        if (!newDate.isSame(oldDate, 'month')) {
+          set(state => {
+            state.dutyMonth = date;
+            state.monthConfig.datesInMonth = newDate.daysInMonth();
+            state.monthConfig.weekendIndexes = getWeekendDayIndexes(date);
+          });
+
+          // Server action
+          await updateDuty(get().id, { dutyMonth: get().dutyMonth });
+        }
       },
       resetDuty: () => {
         set(() => defaultState);
@@ -119,7 +127,11 @@ const useDutyStoreBase = create<DutyState & DutyActions>()(
           state.assistantSectionConfig = duty.assistantSectionConfig;
           state.sectionList = duty.sectionList;
           state.selectedDays = duty.selectedDays;
-          state.monthConfig = duty.monthConfig;
+          state.dutyMonth = duty.dutyMonth;
+          state.monthConfig = {
+            datesInMonth: dayjs(duty.dutyMonth).daysInMonth(),
+            weekendIndexes: getWeekendDayIndexes(duty.dutyMonth)
+          };
           state.restDayCount = duty.restDayCount;
           state.unwantedDays = duty.unwantedDays;
           state.screenMode = ScreenMode.MonthPicker;
@@ -140,6 +152,7 @@ const useDutyStoreBase = create<DutyState & DutyActions>()(
           assistantSectionConfig: get().assistantSectionConfig,
           sectionList: get().sectionList,
           selectedDays: get().selectedDays,
+          dutyMonth: get().dutyMonth,
           monthConfig: get().monthConfig,
           restDayCount: get().restDayCount,
           disabledDays: get().disabledDays,

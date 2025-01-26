@@ -1,6 +1,6 @@
 'use client';
 
-import { deleteDutyById, pinDuty } from '@/libs/db/actions/duty-actions';
+import { deleteDutyById, updateDuty } from '@/libs/db/actions/duty-actions';
 import { IDuty } from '@/libs/models/duty-model';
 import {
   ActionIcon,
@@ -43,7 +43,7 @@ export default function DutyCard({ duty }: DutyCardProps) {
 
   const totalAssistants = duty.assistantList.length;
   const totalSections = duty.sectionList.length;
-  const selectedMonth = dayjs(duty.monthConfig?.selectedDate).format('MMMM YYYY');
+  const selectedMonth = dayjs(duty.dutyMonth).format('MMMM YYYY');
 
   const editDuty = async () => {
     isLoading(true);
@@ -54,14 +54,9 @@ export default function DutyCard({ duty }: DutyCardProps) {
     // TODO: Implement set note functionality
   };
 
-  const handlePinDuty = async () => {
-    setDutyState({ ...dutyState, pinned: true });
-    await pinDuty(duty.id, true);
-  };
-
-  const handleUnpinDuty = async () => {
-    setDutyState({ ...dutyState, pinned: false });
-    await pinDuty(duty.id, false);
+  const handlePinDuty = async (pinned: boolean) => {
+    setDutyState({ ...dutyState, pinned: pinned });
+    await updateDuty(duty.id, { pinned: pinned });
   };
 
   const deleteDuty = async () => {
@@ -109,11 +104,13 @@ export default function DutyCard({ duty }: DutyCardProps) {
               Set Note
             </Menu.Item>
             {dutyState.pinned ? (
-              <Menu.Item onClick={handleUnpinDuty} leftSection={<IconPinnedOff size={18} />}>
+              <Menu.Item
+                onClick={() => handlePinDuty(false)}
+                leftSection={<IconPinnedOff size={18} />}>
                 Unpin
               </Menu.Item>
             ) : (
-              <Menu.Item onClick={handlePinDuty} leftSection={<IconPinned size={18} />}>
+              <Menu.Item onClick={() => handlePinDuty(true)} leftSection={<IconPinned size={18} />}>
                 Pin
               </Menu.Item>
             )}

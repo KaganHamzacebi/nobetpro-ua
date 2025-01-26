@@ -33,14 +33,16 @@ export const createDuty = async (duty: IDuty): Promise<IDuty> => {
   return (await res.json()).body;
 };
 
-export const pinDuty = async (dutyId: IDuty['id'], pinned: IDuty['pinned']) => {
+export const updateDuty = async (dutyId: IDuty['id'], duty: Partial<IDuty>): Promise<IDuty> => {
   const c = await cookies();
 
-  await fetch(BASE_API_URL + '/duty/' + dutyId, {
+  const res = await fetch(BASE_API_URL + `/duty/${dutyId}`, {
     method: 'PATCH',
     headers: { Cookie: c.toString() },
-    body: JSON.stringify({ pinned })
+    body: JSON.stringify(duty)
   });
+
+  return (await res.json()).body;
 };
 
 export const selectDay = async (dutyId: IDuty['id'], selectedDay: ISelectedDay) => {
