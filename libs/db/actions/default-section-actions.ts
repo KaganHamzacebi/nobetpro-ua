@@ -12,5 +12,5 @@ export const getDefaultSections = async (): Promise<IDefaultSection[]> => {
     headers: { Cookie: c.toString() }
   });
 
-  return (await res.json()).body;
+  return await res.json();
 };
