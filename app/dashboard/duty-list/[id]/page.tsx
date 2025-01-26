@@ -1,29 +1,15 @@
-'use client';
+'use server';
 
-import SchedulerBase from '@/components/ui/scheduler/scheduler-base';
-import { Modal } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
-import { useRouter } from 'next/navigation';
+import SchedulerModal from '@/components/ui/scheduler/scheduler-modal';
+import { getDutyById } from '@/libs/db/actions/duty-actions';
 
-export default function SchedulerModal() {
-  const router = useRouter();
-  const [opened] = useDisclosure(true);
+interface ISchedulerPage {
+  params: Promise<{ id: string }>;
+}
 
-  const handleOnModalClose = () => {
-    router.back();
-  };
+export default async function SchedulerPage({ params }: Readonly<ISchedulerPage>) {
+  const dutyId = (await params).id;
+  const duty = await getDutyById(dutyId);
 
-  return (
-    <Modal
-      opened={opened}
-      onClose={handleOnModalClose}
-      title="Schedule Duties"
-      size="auto"
-      centered
-      className="h-[85vh] min-h-[85vh]">
-      <Modal.Body>
-        <SchedulerBase />
-      </Modal.Body>
-    </Modal>
-  );
+  return <SchedulerModal duty={duty} />;
 }

@@ -1,10 +1,11 @@
 import Providers from '@/app/providers';
 import Shell from '@/components/ui/shell';
-import { getUser } from '@/libs/supabase/server';
+import { auth } from '@/libs/auth/auth';
 import '@/styles/globals.scss';
 import { ColorSchemeScript } from '@mantine/core';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import Script from 'next/script';
 import { ReactNode } from 'react';
 import Metrics from './metrics';
 
@@ -20,11 +21,17 @@ interface IRootLayout {
 }
 
 export default async function RootLayout({ children }: Readonly<IRootLayout>) {
-  const user = await getUser();
+  const session = await auth();
 
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {process.env.NODE_ENV === 'development' && (
+          <Script
+            src="https://unpkg.com/react-scan/dist/auto.global.js"
+            strategy="afterInteractive"
+          />
+        )}
         <title>Nöbet Pro</title>
         <ColorSchemeScript />
         <meta
@@ -33,10 +40,10 @@ export default async function RootLayout({ children }: Readonly<IRootLayout>) {
         />
       </head>
       <body className={`${inter.className} min-h-screen`}>
-        <Providers user={user}>
+        <Metrics />
+        <Providers session={session}>
           <Shell>{children}</Shell>
         </Providers>
-        <Metrics />
       </body>
     </html>
   );

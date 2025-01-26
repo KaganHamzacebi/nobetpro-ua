@@ -15,7 +15,7 @@ export default function DSColorPicker({
   onClose,
   onChange
 }: Readonly<IDSColorPicker>) {
-  const [color, setColor] = useState<string | null>(initialColor);
+  const [color, setColor] = useState(initialColor);
 
   const handleOnClose = useCallback(() => {
     onClose?.(color ?? '');

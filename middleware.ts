@@ -1,20 +1,26 @@
-import { type NextRequest } from 'next/server';
-import { updateSession } from './libs/supabase/middleware';
+import { NextResponse } from 'next/server';
+import { auth } from './libs/auth/auth';
 
-export async function middleware(request: NextRequest) {
-  return await updateSession(request);
-}
+const WHITE_LIST = ['/', '/how-to', '/contact-us'];
+
+export default auth(async req => {
+  const isWhiteListed = WHITE_LIST.includes(req.nextUrl.pathname);
+
+  // Redirect to sign-in page if not authenticated
+  if (!req.auth && !isWhiteListed) {
+    const url = new URL('/', req.nextUrl.origin);
+    return NextResponse.redirect(url);
+  }
+
+  // Redirect to home page if authenticated
+  if (req.auth && isWhiteListed) {
+    const url = new URL('/dashboard/duty-list', req.nextUrl.origin);
+    return NextResponse.redirect(url);
+  }
+
+  return NextResponse.next();
+});
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - images - .svg, .png, .jpg, .jpeg, .gif, .webp
-     * Feel free to modify this pattern to include more paths.
-     */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'
-  ]
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)']
 };

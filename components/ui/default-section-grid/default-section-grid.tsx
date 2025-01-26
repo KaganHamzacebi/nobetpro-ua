@@ -1,13 +1,16 @@
 'use client';
 
 import { caseInsensitiveSorter } from '@/libs/helpers/case-insensitive-sorter.helper';
-import { useDefaultSection } from '@/libs/hooks/db/use-default-sections';
-import { IDefaultSection } from '@/libs/models/ISection';
+import { GenerateUUID } from '@/libs/helpers/id-generator';
+import { useDefaultSection } from '@/libs/hooks/use-default-sections';
+import { IDefaultSection } from '@/libs/models/duty-model';
 import {
+  IMRT_Cell,
+  IMRT_Edit,
   OnCreatingRowSave,
   RenderRowActions,
   RenderTopToolbarCustomActions
-} from '@/libs/models/MRTGridTypes';
+} from '@/libs/models/mrt-model';
 import { Button, Group, NumberInput, Text, UnstyledButton } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { IconTrash } from '@tabler/icons-react';
@@ -22,7 +25,7 @@ import { useCallback, useMemo, useState } from 'react';
 import DSColorPicker from '../color-picker';
 
 export default function DefaultSectionGrid() {
-  const [creatingState, setCreatingState] = useState<Partial<IDefaultSection>>({
+  const [creatingState, setCreatingState] = useState({
     color: '',
     defaultValue: 0
   });
@@ -41,6 +44,7 @@ export default function DefaultSectionGrid() {
     ({ values, exitCreatingMode }) => {
       const handleCreation = async () => {
         await createDefaultSection({
+          id: GenerateUUID(),
           name: values.name,
           defaultValue: creatingState.defaultValue,
           color: creatingState.color
@@ -66,7 +70,7 @@ export default function DefaultSectionGrid() {
       if (isCreating) return;
 
       const updatedDefaultSection = {
-        id: row.original.id,
+        id: row.original.id as string,
         [field]: value
       };
       updateDefaultSection(updatedDefaultSection);
@@ -140,7 +144,7 @@ export default function DefaultSectionGrid() {
         accessorKey: 'defaultValue',
         header: 'Value',
         sortingFn: caseInsensitiveSorter,
-        Edit: ({ row, table }) => (
+        Edit: ({ row, table }: IMRT_Edit<IDefaultSection>) => (
           <NumberInput
             defaultValue={row.original.defaultValue}
             allowNegative={false}
@@ -156,7 +160,7 @@ export default function DefaultSectionGrid() {
         header: 'Color',
         sortingFn: caseInsensitiveSorter,
         enableEditing: false,
-        Cell: ({ row, table }) => (
+        Cell: ({ row, table }: IMRT_Cell<IDefaultSection>) => (
           <DSColorPicker
             color={row.original.color}
             onChange={value => handleCreationValues(value, 'color', !row.original.id)}
@@ -195,7 +199,7 @@ export default function DefaultSectionGrid() {
       <Group content="center">
         <UnstyledButton
           color="red"
-          onClick={() => askForDeletion(() => deleteSection(row.original.id, table))}>
+          onClick={() => askForDeletion(() => deleteSection(row.original.id as string, table))}>
           <IconTrash size={20} color="red" />
         </UnstyledButton>
       </Group>

@@ -1,17 +1,15 @@
+import { auth } from '@/libs/auth/auth';
 import prisma from '@/libs/db/prisma';
-import { getUser } from '@/libs/supabase/server';
 import { Prisma } from '@prisma/client';
+import { unauthorized } from 'next/navigation';
 
 // Get All Default Assistants
 export async function GET() {
-  const user = await getUser();
-  const userId = user?.id;
+  const session = await auth();
+  const userId = session?.user?.id;
 
   if (!userId) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    unauthorized();
   }
 
   const data = await prisma.defaultAssistant.findMany({
@@ -24,14 +22,13 @@ export async function GET() {
 
 // Create New Default Assistant
 export async function POST(request: Request) {
-  const user = await getUser();
-  const userId = user?.id;
+  const session = await auth();
+  const userId = session?.user?.id;
 
-  // body should contain atleast name
-  const body: Omit<Prisma.DefaultAssistantCreateInput, 'User'> = await request.json();
+  const body: Omit<Prisma.DefaultAssistantCreateInput, 'user'> = await request.json();
   const createData: Prisma.DefaultAssistantCreateInput = {
     ...body,
-    User: {
+    user: {
       connect: {
         id: userId
       }
@@ -46,8 +43,8 @@ export async function POST(request: Request) {
 
 // Update Default Assistants
 export async function PUT(request: Request) {
-  const user = await getUser();
-  const userId = user?.id;
+  const session = await auth();
+  const userId = session?.user?.id;
 
   type UpdateInput = Prisma.DefaultAssistantUpdateInput & { id: string };
   const body: UpdateInput = await request.json();

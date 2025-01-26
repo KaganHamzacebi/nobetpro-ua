@@ -1,10 +1,12 @@
+import { auth } from '@/libs/auth/auth';
 import prisma from '@/libs/db/prisma';
-import { getUser } from '@/libs/supabase/server';
+import { unauthorized } from 'next/navigation';
 
 // Bulk Delete
 export async function POST(request: Request) {
-  const user = await getUser();
-  const userId = user?.id;
+  const session = await auth();
+  if (!session) unauthorized();
+  const userId = session.user?.id;
 
   const idsToDelete = (await request.json()) as string[];
   await prisma.defaultSection.deleteMany({

@@ -1,37 +1,34 @@
+'use client';
+
 import { ScreenMode } from '@/libs/enums/screen-mode';
+import { useDutyStore } from '@/libs/stores/use-duty-store';
 import { Button, Group } from '@mantine/core';
 import { IconTrashFilled } from '@tabler/icons-react';
-import { useContext } from 'react';
+import { memo } from 'react';
 import AddButton from '../add-button';
-import { SchedulerContext } from './scheduler-base';
 
-interface ISchedulerBottomBar {
-  addAssistant: () => void;
-  addSection: () => void;
-  handleClearSelections: () => void;
-}
-
-export default function SchedulerBottomBar({
-  addAssistant,
-  addSection,
-  handleClearSelections
-}: Readonly<ISchedulerBottomBar>) {
-  const { screenMode } = useContext(SchedulerContext);
+function SchedulerBottomBar() {
+  const addAssistant = useDutyStore.use.addAssistant();
+  const addSection = useDutyStore.use.addSection();
+  const screenMode = useDutyStore.use.screenMode();
+  const clearAssistantSelections = useDutyStore.use.clearAllSelections();
 
   return (
-    <Group>
+    <Group gap="sm">
       <AddButton label="Add Assistant" onClick={addAssistant} />
       {screenMode === ScreenMode.SectionEditor && (
         <AddButton label="Add New Section" onClick={addSection} />
       )}
       {screenMode === ScreenMode.MonthPicker && (
         <Button
-          leftSection={<IconTrashFilled />}
-          onClick={handleClearSelections}
-          className="bg-attention hover:bg-attention-hover">
+          leftSection={<IconTrashFilled size={20} />}
+          onClick={clearAssistantSelections}
+          color="red">
           Clear Selections
         </Button>
       )}
     </Group>
   );
 }
+
+export default memo(SchedulerBottomBar);

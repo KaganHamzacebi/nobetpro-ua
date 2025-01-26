@@ -1,7 +1,11 @@
+'server-only';
+
+import { IDefaultSection } from '@/libs/models/duty-model';
+
 import { type Prisma } from '@prisma/client';
 import { BASE_API_URL } from '../consts/api';
 
-export const getDefaultSections = async () => {
+export const getDefaultSections = async (): Promise<IDefaultSection[]> => {
   const response = await fetch(BASE_API_URL + `/default-sections`);
   if (!response.ok) {
     throw new Error('Error fetching default sections');
@@ -10,9 +14,7 @@ export const getDefaultSections = async () => {
   return response.json();
 };
 
-export const createDefaultSection = async (
-  defaultSection: Omit<Prisma.DefaultSectionCreateInput, 'User'>
-) => {
+export const createDefaultSection = async (defaultSection: IDefaultSection) => {
   const response = await fetch(BASE_API_URL + `/default-sections`, {
     method: 'POST',
     body: JSON.stringify(defaultSection)

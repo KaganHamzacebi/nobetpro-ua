@@ -1,26 +1,26 @@
 'use client';
 
-import { useUser } from '@/app/providers';
-import { signOut } from '@/libs/supabase/login-actions';
+import { logout } from '@/libs/auth/login-actions';
 import classes from '@/styles/UserButton.module.scss';
 import { Avatar, Group, Menu, Text, UnstyledButton, rem } from '@mantine/core';
 import { IconChevronRight, IconLogout, IconSettings } from '@tabler/icons-react';
+import { useSession } from 'next-auth/react';
 
 export function UserButton() {
-  const user = useUser();
+  const { data: session } = useSession();
 
   const userButton = (
     <UnstyledButton className={classes.user}>
       <Group>
-        <Avatar src={user?.user_metadata.avatar_url} radius="xl" />
+        <Avatar src={session?.user?.image} radius="xl" />
 
         <div style={{ flex: 1 }}>
           <Text size="sm" fw={500}>
-            {user?.user_metadata.full_name}
+            {session?.user?.name}
           </Text>
 
           <Text c="dimmed" size="xs">
-            {user?.user_metadata.email}
+            {session?.user?.email}
           </Text>
         </div>
 
@@ -39,7 +39,7 @@ export function UserButton() {
       <Menu.Divider />
       <Menu.Item
         color="red"
-        onClick={() => signOut()}
+        onClick={logout}
         leftSection={<IconLogout style={{ width: rem(14), height: rem(14) }} />}>
         Sign Out
       </Menu.Item>

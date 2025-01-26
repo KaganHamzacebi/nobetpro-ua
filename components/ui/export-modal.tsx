@@ -1,40 +1,20 @@
-import { IAssistant } from '@/libs/models/IAssistant';
-import { ISection } from '@/libs/models/ISection';
+import { useDutyStore } from '@/libs/stores/use-duty-store';
 import { Button, Modal, Table } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { useContext, useMemo } from 'react';
-import { SchedulerContext } from './scheduler/scheduler-base';
+import { FC, useMemo } from 'react';
 
-interface IExportModal {
-  assistantList: IAssistant[];
-  sectionList: ISection[];
-}
-
-export default function ExportModal({ assistantList, sectionList }: Readonly<IExportModal>) {
-  const { monthConfig } = useContext(SchedulerContext);
+export default function ExportModal() {
   const [opened, { open, close }] = useDisclosure(false);
+  const sectionList = useDutyStore.use.sectionList();
+  const assistantList = useDutyStore.use.assistantList();
 
   const headerData = useMemo(() => {
     return ['', ...sectionList.map(s => s.name)];
   }, [sectionList]);
 
   const tableData = useMemo(() => {
-    const data: string[][] = Array(monthConfig.datesInMonth)
-      .fill(null)
-      .map((_, index) => [String(index + 1), ...Array(sectionList.length).fill('')]);
-
-    for (const assistant of assistantList) {
-      const days = Object.keys(assistant.selectedDays.days).map(i => Number(i));
-      for (const dayIndex of days) {
-        const sectionIndex = headerData.findIndex(
-          h => h === assistant.selectedDays.days[dayIndex].name
-        );
-        data[dayIndex][sectionIndex] = assistant.name;
-      }
-    }
-
-    return data;
-  }, [assistantList, headerData, monthConfig.datesInMonth, sectionList.length]);
+    return [];
+  }, []);
 
   const headers = (
     <Table.Tr>
@@ -46,7 +26,7 @@ export default function ExportModal({ assistantList, sectionList }: Readonly<IEx
     </Table.Tr>
   );
 
-  const rows = tableData.map((row: string[]) => (
+  const Row: FC<{ row: string[] }> = ({ row }) => (
     <Table.Tr key={`row-${row[0]}`}>
       {row.map((cell, i) => (
         <Table.Th key={`${cell}-${i}`} className={`text-center ${i === 0 && 'w-4 bg-onyx'}`}>
@@ -54,7 +34,7 @@ export default function ExportModal({ assistantList, sectionList }: Readonly<IEx
         </Table.Th>
       ))}
     </Table.Tr>
-  ));
+  );
 
   return (
     <>
@@ -72,10 +52,16 @@ export default function ExportModal({ assistantList, sectionList }: Readonly<IEx
           stickyHeader
           stickyHeaderOffset={60}>
           <Table.Thead>{headers}</Table.Thead>
-          <Table.Tbody>{rows}</Table.Tbody>
+          <Table.Tbody>
+            {tableData.map(row => (
+              <Row key={row[0]} row={row} />
+            ))}
+          </Table.Tbody>
         </Table>
       </Modal>
-      <Button onClick={open}>Export</Button>
+      <Button onClick={open} disabled={sectionList.length === 0 || assistantList.length === 0}>
+        Export
+      </Button>
     </>
   );
 }

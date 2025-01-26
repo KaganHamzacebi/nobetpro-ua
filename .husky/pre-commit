@@ -1,4 +1,6 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
+#!/bin/sh
+# Configure Git to handle line endings
+git config core.autocrlf true
 
-pnpm lint-staged
+# Run lint-staged
+npx --no-install lint-staged
