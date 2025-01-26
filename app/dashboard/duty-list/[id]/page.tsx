@@ -3,7 +3,11 @@
 import SchedulerModal from '@/components/ui/scheduler/scheduler-modal';
 import { getDutyById } from '@/libs/db/actions/duty-actions';
 
-export default async function SchedulerPage({ params }: { params: Promise<{ id: string }> }) {
+interface ISchedulerPage {
+  params: Promise<{ id: string }>;
+}
+
+export default async function SchedulerPage({ params }: Readonly<ISchedulerPage>) {
   const dutyId = (await params).id;
   const duty = await getDutyById(dutyId);
 

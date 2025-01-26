@@ -32,21 +32,21 @@ import dayjs from 'dayjs';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-interface DutyCardProps {
+interface IDutyCard {
   duty: IDuty;
 }
 
-export default function DutyCard({ duty }: DutyCardProps) {
+export default function DutyCard({ duty }: Readonly<IDutyCard>) {
   const [dutyState, setDutyState] = useState(duty);
   const router = useRouter();
-  const [loading, isLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const totalAssistants = duty.assistantList.length;
   const totalSections = duty.sectionList.length;
   const selectedMonth = dayjs(duty.dutyMonth).format('MMMM YYYY');
 
   const editDuty = async () => {
-    isLoading(true);
+    setLoading(true);
     router.push(`/dashboard/duty-list/${duty.id}`);
   };
 
@@ -60,9 +60,9 @@ export default function DutyCard({ duty }: DutyCardProps) {
   };
 
   const deleteDuty = async () => {
-    isLoading(true);
+    setLoading(true);
     await deleteDutyById(duty.id as string);
-    isLoading(false);
+    setLoading(false);
   };
 
   return (

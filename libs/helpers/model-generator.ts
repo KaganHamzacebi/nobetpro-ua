@@ -13,7 +13,7 @@ import dayjs from 'dayjs';
 const NewDuty = (defaultAssistants: IDefaultAssistant[], defaultSections: IDefaultSection[]) => {
   const dutySections: IDutySection[] = defaultSections.map(section =>
     NewDutySection({
-      ...(section as IDutySection),
+      ...section,
       id: GenerateUUID()
     })
   );

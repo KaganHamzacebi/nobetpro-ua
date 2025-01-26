@@ -3,7 +3,7 @@ import { IconTrashFilled } from '@tabler/icons-react';
 import { memo, useState } from 'react';
 
 interface ITrashButton {
-  callback: (...args: unknown[]) => Promise<unknown> | unknown;
+  callback: (...args: unknown[]) => Promise<unknown> | void;
   tooltip?: string;
 }
 

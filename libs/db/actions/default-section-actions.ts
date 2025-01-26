@@ -1,18 +1,16 @@
 'use server';
 
-import { auth } from '@/libs/auth/auth';
-import { DefaultSection } from '@prisma/client';
-import { unauthorized } from 'next/navigation';
-import prisma from '../prisma';
+import { BASE_API_URL } from '@/libs/consts/api';
+import { IDefaultSection } from '@/libs/models/duty-model';
+import { cookies } from 'next/headers';
 
-const getDefaultSections = async (): Promise<DefaultSection[]> => {
-  const session = await auth();
-  if (!session) unauthorized();
-  const userId = session.user?.id;
+export const getDefaultSections = async (): Promise<IDefaultSection[]> => {
+  const c = await cookies();
 
-  return await prisma.defaultSection.findMany({
-    where: { userId: userId }
+  const res = await fetch(BASE_API_URL + '/default-sections', {
+    method: 'GET',
+    headers: { Cookie: c.toString() }
   });
-};
 
-export { getDefaultSections };
+  return (await res.json()).body;
+};

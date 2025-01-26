@@ -1,20 +1,12 @@
 import { auth } from '@/libs/auth/auth';
 import prisma from '@/libs/db/prisma';
+import { getSessionOrThrow } from '@/libs/helpers/auth.helper';
 import { Prisma } from '@prisma/client';
 import { unauthorized } from 'next/navigation';
 
 // Get All Default Sections
 export async function GET() {
-  const session = await auth();
-  if (!session) unauthorized();
-  const userId = session.user?.id;
-
-  if (!userId) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json' }
-    });
-  }
+  const { userId } = await getSessionOrThrow();
 
   const data = await prisma.defaultSection.findMany({
     where: { userId: userId },
@@ -26,9 +18,7 @@ export async function GET() {
 
 // Create New Default Section
 export async function POST(request: Request) {
-  const session = await auth();
-  if (!session) unauthorized();
-  const userId = session.user?.id;
+  const { userId } = await getSessionOrThrow();
 
   const body: Omit<Prisma.DefaultSectionCreateInput, 'user'> = await request.json();
   const createData: Prisma.DefaultSectionCreateInput = {

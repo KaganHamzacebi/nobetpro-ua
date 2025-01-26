@@ -16,7 +16,7 @@ export const DefaultSectionSchema = z.object({
   userId: UuidSchema.optional(),
   name: z.string(),
   defaultValue: z.number().min(0),
-  color: z.string().nullable(),
+  color: z.string(),
   updatedAt: z.coerce.date().optional(),
   createdAt: z.coerce.date().optional()
 });
