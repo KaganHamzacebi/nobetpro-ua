@@ -36,6 +36,9 @@ jobs:
         run: pnpm install
       - name: Build
         run: pnpm build
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
 
   lint:
     runs-on: ubuntu-latest
