@@ -3,6 +3,4 @@
 @import 'mantine-react-table/styles.css';
 @import '@mantine/notifications/styles.css';
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
