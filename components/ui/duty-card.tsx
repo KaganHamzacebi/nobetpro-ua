@@ -72,7 +72,7 @@ export default function DutyCard({ duty }: Readonly<IDutyCard>) {
       radius="md"
       withBorder
       onClick={editDuty}
-      className="w-[350px] cursor-pointer transition-colors duration-300 hover:bg-cinder">
+      className="hover:bg-cinder w-[350px] cursor-pointer transition-colors duration-300">
       <Flex justify="space-between" align={'center'} direction={'row'} wrap={'wrap'}>
         <Flex direction={'row'} gap={'sm'} align={'center'}>
           {dutyState.pinned && <IconPin size={24} color="orange" />}

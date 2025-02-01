@@ -10,7 +10,7 @@ function SchedulerTopBar() {
     <Group>
       <DSMonthPickerInput />
       <RestDayInput />
-      <div className="ml-auto mt-auto flex flex-row gap-x-4">
+      <div className="mt-auto ml-auto flex flex-row gap-x-4">
         <ExportModal />
         <ScreenModeInput />
       </div>

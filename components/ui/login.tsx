@@ -77,7 +77,7 @@ export default function Login() {
 
   return (
     <form className="w-full max-w-[400px]" onSubmit={undefined}>
-      <Stack className="rounded border border-silver border-opacity-50 p-4">
+      <Stack className="border-silver border-opacity-50 rounded border p-4">
         <Text fw={600} size="lg">
           Login
         </Text>

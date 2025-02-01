@@ -9,7 +9,7 @@ export default function Logo() {
         href="/"
         variant="default"
         radius="md"
-        className="h-fit w-fit bg-onyx px-1 shadow-lg">
+        className="bg-onyx h-fit w-fit px-1 shadow-lg">
         <Title order={1} className="text-snow">
           NöbetPro
         </Title>
