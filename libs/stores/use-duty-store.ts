@@ -95,10 +95,13 @@ const useDutyStoreBase = create<DutyState & DutyActions>()(
           state.tableState = tableState;
         });
       },
-      setRestDays: restDays => {
+      setRestDays: async restDays => {
         set(state => {
           state.restDayCount = restDays;
         });
+
+        // Server action
+        await updateDuty(get().id, { restDayCount: restDays });
       },
       setDate: async date => {
         const oldDate = dayjs(get().dutyMonth);

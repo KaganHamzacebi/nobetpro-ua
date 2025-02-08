@@ -1,12 +1,14 @@
 import { ScreenMode } from '@/libs/enums/screen-mode';
 import { TableState } from '@/libs/enums/table-state';
 import { monthCellCssClasses } from '@/libs/helpers/mantine-table-css.helper';
+import { setSearchParam } from '@/libs/helpers/route.helper';
 import { IDutyAssistant } from '@/libs/models/duty-model';
 import { IMRT_Cell } from '@/libs/models/mrt-model';
 import { useDutyStore } from '@/libs/stores/use-duty-store';
 import { MantineReactTable, MRT_ColumnDef, useMantineReactTable } from 'mantine-react-table';
 import dynamic from 'next/dynamic';
-import { memo, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { memo, useEffect, useMemo, useState } from 'react';
 
 const AssistantNameRenderer = dynamic(
   () => import('@/components/ui/scheduler/table-renderers/assistant-name-renderer'),
@@ -31,6 +33,9 @@ const MonthCellRenderer = dynamic(
 type RowType = IDutyAssistant;
 
 function SchedulerTable() {
+  const searchParams = useSearchParams();
+  const pageParam = searchParams.get('page');
+
   const monthConfig = useDutyStore.use.monthConfig();
   const screenMode = useDutyStore.use.screenMode();
   const tableState = useDutyStore.use.tableState();
@@ -39,8 +44,19 @@ function SchedulerTable() {
   const unwantedDays = useDutyStore.use.unwantedDays();
   const toggleUnwantedDay = useDutyStore.use.toggleUnwantedDay();
 
-  const page = 1;
   const pageSize = 10;
+  const initialPage = pageParam ? parseInt(pageParam) - 1 : 0;
+  const totalPages = Math.ceil(assistantList.length / pageSize);
+
+  const [pagination, setPagination] = useState({
+    pageIndex: initialPage,
+    pageSize: pageSize
+  });
+
+  useEffect(() => {
+    const page = pagination.pageIndex + 1;
+    setSearchParam('page', page);
+  }, [pagination.pageIndex, pagination.pageSize]);
 
   const assistantNameColumn = useMemo<MRT_ColumnDef<IDutyAssistant>>(
     () => ({
@@ -129,15 +145,19 @@ function SchedulerTable() {
     enableColumnPinning: true,
     enableStickyHeader: true,
     enablePagination: true,
+    autoResetPageIndex: false,
     paginationDisplayMode: 'pages',
+    onPaginationChange: setPagination,
+    pageCount: totalPages,
     mantinePaginationProps: {
-      showRowsPerPage: false
+      showRowsPerPage: false,
+      total: totalPages
     },
     state: {
-      showLoadingOverlay: tableState === TableState.Loading
+      showLoadingOverlay: tableState === TableState.Loading,
+      pagination: pagination
     },
     initialState: {
-      pagination: { pageSize: pageSize, pageIndex: page - 1 },
       columnPinning: { left: ['assistant_name'] },
       density: 'xs'
     },

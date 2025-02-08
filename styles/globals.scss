@@ -1,6 +1,14 @@
+@use 'tailwindcss';
+
 @import '@mantine/core/styles.css';
 @import '@mantine/dates/styles.css';
 @import 'mantine-react-table/styles.css';
 @import '@mantine/notifications/styles.css';
 
-@import 'tailwindcss';
+@theme {
+  --color-onyx: #12141A;
+  --color-cinder: #232833;
+  --color-success: #19A959;
+  --color-attention: #ED3E41;
+  --color-attention-700: #8C0D0F;
+}
