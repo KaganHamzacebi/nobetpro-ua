@@ -3,13 +3,14 @@ import Link from 'next/link';
 
 export default function Logo() {
   return (
-    <>
+    <div className="flex flex-row gap-x-2">
       <Button
         component={Link}
         href="/"
         variant="default"
         radius="md"
-        className="bg-onyx h-fit w-fit px-1 shadow-lg">
+        size="lg"
+        className="bg-onyx shadow-lg transition-colors duration-300">
         <Title order={1} className="text-snow">
           NöbetPro
         </Title>
@@ -17,6 +18,6 @@ export default function Logo() {
       <Text className="mr-4 self-end" fw={600} c="dimmed">
         in-dev
       </Text>
-    </>
+    </div>
   );
 }
