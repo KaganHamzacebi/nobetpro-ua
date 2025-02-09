@@ -1,0 +1,25 @@
+name: Auto PR from DEV to PRODUCTION
+
+on:
+  schedule:
+    - cron: "0 0 * * 1" # Runs every Monday at midnight UTC
+  workflow_dispatch: # Allows manual triggering of the workflow
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: production
+          branch: development
+          title: "Weekly: DEV → PROD"
+          body: "This is an automated PR merging development into production."
+          labels: "automated, weekly"
+          assignees: "kaganhamzacebi"
+          reviewers: "kaganhamzacebi"
