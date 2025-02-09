@@ -1,8 +1,9 @@
 import { ScreenMode } from '@/libs/enums/screen-mode';
+import { getMonthCellStyles } from '@/libs/helpers/mantine-table-css.helper';
 import { IDutySection } from '@/libs/models/duty-model';
 import { useDutyStore } from '@/libs/stores/use-duty-store';
 import { Center, Checkbox, Menu, MenuDropdown, MenuItem, Tooltip } from '@mantine/core';
-import { FC, memo, useMemo, useState } from 'react';
+import { FC, memo, useCallback, useMemo, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
 interface IMonthCellRenderer {
@@ -51,6 +52,20 @@ function MonthCellRenderer({ dayIndex, assistantId }: Readonly<IMonthCellRendere
   const selectDay = useDutyStore.use.selectDay();
   const unselectDay = useDutyStore.use.unselectDay();
   const sectionList = useDutyStore.use.sectionList();
+
+  const markAsUnwantedDay = useDutyStore.use.markAsUnwantedDay();
+  const unmarkAsUnwantedDay = useDutyStore.use.unmarkAsUnwantedDay();
+
+  const isWeekend = useDutyStore(state => state.monthConfig.weekendIndexes.includes(dayIndex));
+  const isUnwantedDay = !!useDutyStore(state => {
+    return state.unwantedDays.find(
+      day => day.dayIndex === dayIndex && day.assistantId === assistantId
+    );
+  });
+
+  const cellStyle = useMemo(() => {
+    return getMonthCellStyles(isWeekend, isUnwantedDay, screenMode);
+  }, [isUnwantedDay, isWeekend, screenMode]);
 
   const selectedDay = useDutyStore(
     useShallow(state =>
@@ -107,17 +122,27 @@ function MonthCellRenderer({ dayIndex, assistantId }: Readonly<IMonthCellRendere
     setMenuOpen(false);
   };
 
-  if (screenMode !== ScreenMode.MonthPicker || isCheckboxInvisible) return;
+  const toggleUnwantedDay = useCallback(() => {
+    if (isUnwantedDay) unmarkAsUnwantedDay(assistantId, dayIndex);
+    else markAsUnwantedDay(assistantId, dayIndex);
+  }, [assistantId, dayIndex, isUnwantedDay, markAsUnwantedDay, unmarkAsUnwantedDay]);
+
+  const handleCellClick = useCallback(() => {
+    const isUnwantedMode = screenMode === ScreenMode.UnwantedDayPicker;
+    if (isUnwantedMode) toggleUnwantedDay();
+  }, [screenMode, toggleUnwantedDay]);
 
   return (
-    <Center>
+    <Center h="5vh" className={`h-full ${cellStyle}`} onClick={handleCellClick}>
       <Menu shadow="md" opened={menuOpen} onChange={setMenuOpen}>
-        <CheckboxComponent
-          tooltip={selectedDay?.section?.name}
-          isChecked={!!selectedDay}
-          color={selectedDay?.section?.color as string}
-          onChange={handleCheckboxChange}
-        />
+        {screenMode === ScreenMode.MonthPicker && !isCheckboxInvisible && (
+          <CheckboxComponent
+            tooltip={selectedDay?.section?.name}
+            isChecked={!!selectedDay}
+            color={selectedDay?.section?.color as string}
+            onChange={handleCheckboxChange}
+          />
+        )}
         <SectionDropdown sections={filteredSections} onSelectSection={handleSectionSelect} />
       </Menu>
     </Center>

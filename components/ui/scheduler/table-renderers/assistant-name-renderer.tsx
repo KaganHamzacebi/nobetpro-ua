@@ -30,7 +30,7 @@ function AssistantNameRenderer({ assistantId }: Readonly<IAssistantNameRenderer>
   }, [assistant, removeAssistant]);
 
   return (
-    <div className="flex min-w-[200px] flex-row items-center gap-x-2">
+    <div className="flex min-w-fit flex-row items-center gap-x-2 px-2">
       <TextInput
         size="xs"
         value={name}

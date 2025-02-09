@@ -1,6 +1,5 @@
 import { ScreenMode } from '@/libs/enums/screen-mode';
 import { TableState } from '@/libs/enums/table-state';
-import { monthCellCssClasses } from '@/libs/helpers/mantine-table-css.helper';
 import { setSearchParam } from '@/libs/helpers/route.helper';
 import { IDutyAssistant } from '@/libs/models/duty-model';
 import { IMRT_Cell } from '@/libs/models/mrt-model';
@@ -41,8 +40,6 @@ function SchedulerTable() {
   const tableState = useDutyStore.use.tableState();
   const sectionList = useDutyStore.use.sectionList();
   const assistantList = useDutyStore.use.assistantList();
-  const unwantedDays = useDutyStore.use.unwantedDays();
-  const toggleUnwantedDay = useDutyStore.use.toggleUnwantedDay();
 
   const pageSize = 10;
   const initialPage = pageParam ? parseInt(pageParam) - 1 : 0;
@@ -88,16 +85,6 @@ function SchedulerTable() {
             </div>
           )
         },
-        mantineTableBodyCellProps: ({ row }) => ({
-          onClick: () => toggleUnwantedDay(row.original.id, index),
-          className: monthCellCssClasses(
-            index,
-            row.original.id,
-            monthConfig,
-            unwantedDays,
-            screenMode
-          )
-        }),
         Cell: ({ row }: IMRT_Cell<RowType>) => (
           <MonthCellRenderer
             key={`month_cell-${row.original.id}-${index}`}
@@ -106,7 +93,7 @@ function SchedulerTable() {
           />
         )
       })),
-    [monthConfig, screenMode, toggleUnwantedDay, unwantedDays]
+    [monthConfig]
   );
 
   const sectionColumns = useMemo<MRT_ColumnDef<IDutyAssistant>[]>(
@@ -161,12 +148,18 @@ function SchedulerTable() {
       columnPinning: { left: ['assistant_name'] },
       density: 'xs'
     },
+    mantineTableBodyCellProps: {
+      style: { padding: '0', height: 'fit-content', width: 'fit-content' }
+    },
+    mantineTableHeadCellProps: {
+      style: { padding: '0.5rem', height: 'fit-content', width: 'fit-content' }
+    },
     mantineTableProps: {
       withColumnBorders: true,
       highlightOnHover: false
     },
     mantineTableContainerProps: {
-      className: 'h-[57vh]'
+      style: { height: '56vh' }
     },
     getRowId: row => row.id
   });

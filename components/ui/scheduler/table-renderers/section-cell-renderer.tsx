@@ -1,5 +1,5 @@
 import { useDutyStore } from '@/libs/stores/use-duty-store';
-import { NumberInput } from '@mantine/core';
+import { Flex, NumberInput } from '@mantine/core';
 import { useDebouncedCallback, useDidUpdate } from '@mantine/hooks';
 import { memo, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
@@ -36,15 +36,16 @@ function SectionCellRenderer({ assistantId, sectionId }: Readonly<ISectionCellRe
   const minimumSelectableDutyCount = 0;
 
   return (
-    <div className="w-full min-w-[200px]">
+    <Flex align="center" px={8} h="5vh">
       <NumberInput
+        w={80}
         value={totalLimit}
         onChange={e => setTotalLimit(Number(e))}
         size="xs"
         min={minimumSelectableDutyCount}
         allowNegative={false}
       />
-    </div>
+    </Flex>
   );
 }
 
