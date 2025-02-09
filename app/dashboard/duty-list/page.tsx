@@ -39,7 +39,7 @@ export default async function DutyList() {
         </Flex>
       </main>
 
-      <div className="fixed bottom-4 right-4">
+      <div className="fixed right-4 bottom-4">
         <NewDutyButton />
       </div>
     </>

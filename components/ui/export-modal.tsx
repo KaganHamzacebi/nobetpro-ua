@@ -29,7 +29,7 @@ export default function ExportModal() {
   const Row: FC<{ row: string[] }> = ({ row }) => (
     <Table.Tr key={`row-${row[0]}`}>
       {row.map((cell, i) => (
-        <Table.Th key={`${cell}-${i}`} className={`text-center ${i === 0 && 'w-4 bg-onyx'}`}>
+        <Table.Th key={`${cell}-${i}`} className={`text-center ${i === 0 && 'bg-onyx w-4'}`}>
           {cell}
         </Table.Th>
       ))}

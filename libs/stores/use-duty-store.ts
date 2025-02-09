@@ -54,7 +54,8 @@ interface DutyActions {
   addAssistant: () => void;
   removeAssistant: (assistant: IDutyAssistant) => void;
   updateAssistant: (assistantId: IDutyAssistant['id'], props: Partial<IDutyAssistant>) => void;
-  toggleUnwantedDay: (assistantId: string, dayIndex: number) => void;
+  markAsUnwantedDay: (assistantId: string, dayIndex: number) => void;
+  unmarkAsUnwantedDay: (assistantId: string, dayIndex: number) => void;
   selectDay: (assistantId: string, section: IDutySection, dayIndex: number) => void;
   unselectDay: (assistantId: string, dayIndex: number) => void;
   updateDisabledDays: (assistantId: string) => void;
@@ -95,10 +96,13 @@ const useDutyStoreBase = create<DutyState & DutyActions>()(
           state.tableState = tableState;
         });
       },
-      setRestDays: restDays => {
+      setRestDays: async restDays => {
         set(state => {
           state.restDayCount = restDays;
         });
+
+        // Server action
+        await updateDuty(get().id, { restDayCount: restDays });
       },
       setDate: async date => {
         const oldDate = dayjs(get().dutyMonth);
@@ -208,21 +212,31 @@ const useDutyStoreBase = create<DutyState & DutyActions>()(
         // Server Action
         await updateAssistant(get().id, assistantId, props);
       },
-      toggleUnwantedDay: async (assistantId, dayIndex) => {
-        const screenMode = get().screenMode;
-        if (screenMode !== ScreenMode.UnwantedDayPicker) return;
-        const index = get().unwantedDays.findIndex(
-          u => u.assistantId === assistantId && u.dayIndex === dayIndex
-        );
+      markAsUnwantedDay: async (assistantId, dayIndex) => {
+        const unwantedDay = {
+          assistantId,
+          dayIndex,
+          dutyId: get().id
+        };
 
         set(state => {
-          if (index >= 0) state.unwantedDays.splice(index, 1);
-          else state.unwantedDays.push({ assistantId: assistantId, dayIndex });
+          state.unwantedDays.push(unwantedDay);
         });
 
         // Server Action
-        if (index >= 0) await unselectUnwantedDay(get().id, { assistantId, dayIndex });
-        else await selectUnwantedDay(get().id, { assistantId, dayIndex });
+        await selectUnwantedDay(unwantedDay.dutyId, unwantedDay);
+      },
+      unmarkAsUnwantedDay: async (assistantId, dayIndex) => {
+        set(state => {
+          const index = state.unwantedDays.findIndex(
+            u => u.assistantId === assistantId && u.dayIndex === dayIndex
+          );
+          if (index >= 0) state.unwantedDays.splice(index, 1);
+          else throw new Error('Unwanted day not found');
+        });
+
+        // Server Action
+        await unselectUnwantedDay(get().id, { assistantId, dayIndex });
       },
       setAssistantSectionLimit: async (assistantId, sectionId, newLimit) => {
         set(state => {

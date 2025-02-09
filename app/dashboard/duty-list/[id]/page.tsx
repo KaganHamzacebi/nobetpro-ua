@@ -8,8 +8,7 @@ interface ISchedulerPage {
 }
 
 export default async function SchedulerPage({ params }: Readonly<ISchedulerPage>) {
-  const dutyId = (await params).id;
-  const duty = await getDutyById(dutyId);
+  const duty = await getDutyById((await params).id);
 
   return <SchedulerModal duty={duty} />;
 }

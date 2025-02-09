@@ -45,7 +45,7 @@ function SectionHeaderRenderer({ section }: Readonly<ISectionHeaderRenderer>) {
   }, []);
 
   return (
-    <Group className="w-full min-w-[200px]" gap={8} wrap="nowrap">
+    <Group gap={8} wrap="nowrap">
       <TextInput size="xs" value={fields.name} onChange={handleNameChange} />
       <DSColorPicker onClose={handleColorChange} color={fields.color as string} />
       <TrashButton callback={handleRemoveSection} tooltip={`Delete ${section.name}`} />
