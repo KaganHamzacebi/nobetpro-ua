@@ -2,21 +2,22 @@ name: Auto PR from DEV to PRODUCTION
 
 on:
   schedule:
-    - cron: "0 0 * * 1" # Runs every Monday at midnight UTC
-  workflow_dispatch: # Allows manual triggering of the workflow
-
+    - cron: "0 10 * * 1" # Runs every Monday at midnight UTC
 jobs:
-  create-pr:
+  update-production:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
+        with:
+          ref: production
+      - name: Reset Dev branch
+        run: |
+          git fetch origin development
+          git reset --hard main
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.PAT }}
-          base: production
           branch: automated/dev-to-prod
           delete-branch: true
           title: "[Weekly] DEV → PROD"
