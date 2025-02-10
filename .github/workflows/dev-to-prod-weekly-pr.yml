@@ -1,6 +1,7 @@
 name: Auto PR from DEV to PRODUCTION
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: "0 10 * * 1" # Runs every Monday at midnight UTC
 jobs:
