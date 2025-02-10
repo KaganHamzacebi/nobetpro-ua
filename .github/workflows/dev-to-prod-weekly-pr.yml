@@ -13,13 +13,16 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v7
         with:
-          token: ${{ secrets.PAT_TOKEN }}
+          token: ${{ secrets.PAT }}
           base: production
-          branch: development
-          title: "Weekly: DEV → PROD"
+          branch: automated/dev-to-prod
+          delete-branch: true
+          title: "[Weekly] DEV → PROD"
           body: "This is an automated PR merging development into production."
-          labels: "automated, weekly"
+          labels: |
+            automated
+            weekly
           assignees: "kaganhamzacebi"
           reviewers: "kaganhamzacebi"
