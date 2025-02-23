@@ -38,7 +38,7 @@ type DutyFields = {
 };
 
 interface DutyState extends DutyFields {
-  tableState: 'loading' | 'active';
+  tableState: TableState;
   screenMode: ScreenMode;
 }
 

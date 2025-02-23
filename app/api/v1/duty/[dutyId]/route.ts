@@ -2,6 +2,7 @@ import { dutyProtectedFields } from '@/libs/consts/protected-fields';
 import prisma from '@/libs/db/prisma';
 import { getDataOrThrow, getSessionOrThrow } from '@/libs/helpers/auth.helper';
 import { clearUndefinedFieldsInPlace, removeFields } from '@/libs/helpers/protected-field.helper';
+import { NotFound } from '@/libs/helpers/response.helper';
 import { UuidSchema } from '@/libs/helpers/schemas';
 import { DutySchema, IDuty } from '@/libs/models/duty-model';
 import { NextRequest } from 'next/server';
@@ -39,10 +40,7 @@ export async function GET(
   });
 
   if (response == null) {
-    return Response.json({
-      status: 404,
-      message: `Duty with ID: ${dutyId} not found`
-    });
+    return NotFound(`Duty with ID: ${dutyId} not found`);
   }
 
   return Response.json(response);

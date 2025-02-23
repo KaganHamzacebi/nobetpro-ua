@@ -1,5 +1,6 @@
 'use client';
 
+import AutoFillButton from '@/components/ui/auto-fill-button';
 import { ScreenMode } from '@/libs/enums/screen-mode';
 import { useDutyStore } from '@/libs/stores/use-duty-store';
 import { Button, Group } from '@mantine/core';
@@ -27,6 +28,9 @@ function SchedulerBottomBar() {
           Clear Selections
         </Button>
       )}
+      <div className="ml-auto">
+        <AutoFillButton />
+      </div>
     </Group>
   );
 }

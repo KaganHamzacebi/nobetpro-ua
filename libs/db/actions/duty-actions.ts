@@ -281,3 +281,12 @@ export const updateAssistantSectionConfigLimit = async (
     body: JSON.stringify({ assistantId, sectionId, totalLimit })
   });
 };
+
+export const autoFill = async (dutyId: IDuty['id']) => {
+  const c = await cookies();
+
+  await fetch(BASE_API_URL + `/duty/${dutyId}/auto-fill`, {
+    method: 'POST',
+    headers: { Cookie: c.toString() }
+  });
+};
