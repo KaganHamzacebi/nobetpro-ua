@@ -1,0 +1,29 @@
+name: Auto PR from DEV to PRODUCTION
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 10 * * 1" # Runs every Monday at midnight UTC
+jobs:
+ create-pr:
+   runs-on: ubuntu-latest
+   steps:
+     - uses: actions/checkout@v4
+       with:
+         ref: production
+     - name: Reset promotion branch
+       run: |
+          git fetch origin development:development
+          git reset --hard development
+     - name: Create Pull Request
+       uses: peter-evans/create-pull-request@v7
+       with:
+         token: ${{ secrets.PAT }}
+         branch: automated/dev-to-prod
+         delete-branch: true
+         title: "[Weekly] DEV → PROD"
+         body: "This is an automated PR merging development into production."
+         labels: |
+            automated
+            weekly
+         assignees: "kaganhamzacebi"
