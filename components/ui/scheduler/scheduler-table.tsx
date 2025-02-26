@@ -141,7 +141,8 @@ function SchedulerTable() {
       total: totalPages
     },
     state: {
-      showLoadingOverlay: tableState === TableState.Loading,
+      showSkeletons: tableState === TableState.Loading,
+      showLoadingOverlay: tableState === TableState.InProgress,
       pagination: pagination
     },
     initialState: {

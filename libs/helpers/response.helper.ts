@@ -21,6 +21,10 @@ export const BadRequest = (message?: unknown) => {
   return NextResponse.json({ error: message }, { status: HttpStatusCode.BadRequest });
 };
 
+export const NotFound = (message?: unknown) => {
+  return NextResponse.json({ error: message }, { status: HttpStatusCode.NotFound });
+};
+
 export const Unauthorized = (message: unknown) => {
   return NextResponse.json({ error: message }, { status: HttpStatusCode.Unauthorized });
 };
